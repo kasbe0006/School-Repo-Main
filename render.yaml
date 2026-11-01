@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: collage-school-erp
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run.py
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: HOST
+        value: 0.0.0.0
+      - key: UCMS_DB_PATH
+        value: /var/data/ucms.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      - key: AUTO_SEED
+        value: false
+      - key: PROVISION_ADMIN_EMAIL
+        sync: false
+      - key: PROVISION_ADMIN_PASSWORD
+        sync: false
+      - key: SCHOOL_NAME
+        value: Your School Name
+      - key: SCHOOL_SHORT_NAME
+        value: Your School
+      - key: SCHOOL_TAGLINE
+        value: Simple school management system
+    disk:
+      name: ucms-data
+      mountPath: /var/data
+      sizeGB: 1

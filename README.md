@@ -154,8 +154,8 @@ erDiagram
 **Requirement:** Python 3.11 or newer. SQLite ships with Python.
 
 ```bash
-git clone https://github.com/Md-Emon-Hasan/ucms.git
-cd ucms
+git clone https://github.com/kasbe0006/School-Repo-Main.git
+cd School-Repo-Main
 python -m venv .venv
 .venv\Scripts\activate              # Windows
 # source .venv/bin/activate         # macOS / Linux

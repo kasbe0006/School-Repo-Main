@@ -24,11 +24,11 @@ services:
       - key: PROVISION_ADMIN_PASSWORD
         sync: false
       - key: SCHOOL_NAME
-        value: Your School Name
+        value: Zilla Parishad Primary School, Mamdapur
       - key: SCHOOL_SHORT_NAME
-        value: Your School
+        value: ZPPS Mamdapur
       - key: SCHOOL_TAGLINE
-        value: School management made simple
+        value: School management for ZPPS Mamdapur
     disk:
       name: ucms-data
       mountPath: /var/data

@@ -99,7 +99,11 @@ const LOGO_SVG = `
     <path d="M9.5 16.8v4.4c0 1.8 2.9 3.3 6.5 3.3s6.5-1.5 6.5-3.3v-4.4L16 20l-6.5-3.2Z" fill="#dae4ff"/>
   </svg>`;
 
-let branding = { school_name: 'School ERP', school_short_name: 'School ERP', school_tagline: 'School management made simple' };
+let branding = {
+  school_name: 'Zilla Parishad Primary School, Mamdapur',
+  school_short_name: 'ZPPS Mamdapur',
+  school_tagline: 'School management for ZPPS Mamdapur',
+};
 
 function loadBranding() {
   return api.get('/config', null, { silent: true }).then((data) => {

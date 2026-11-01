@@ -26,3 +26,19 @@ class AnnouncementCreate(StrictModel):
         if value is not None and value < date.today():
             raise ValueError("expires_on cannot be in the past")
         return value
+
+
+class AnnouncementUpdate(StrictModel):
+    """Body of PATCH /api/announcements/{id}."""
+    title: str | None = Field(default=None, min_length=3, max_length=150)
+    body: str | None = Field(default=None, min_length=3, max_length=5000)
+    target_role: Role | None = None
+    target_department_id: int | None = None
+    expires_on: date | None = None
+
+    @field_validator("expires_on")
+    @classmethod
+    def not_in_past(cls, value: date | None) -> date | None:
+        if value is not None and value < date.today():
+            raise ValueError("expires_on cannot be in the past")
+        return value

@@ -31,6 +31,46 @@ function initSchoolContent({ content, user }) {
   document.getElementById('new-announcement')?.addEventListener('click', openAnnouncementForm);
 }
 
+function openContentEditForm(item) {
+  const formId = 'edit-school-content-form';
+  const modal = openModal({
+    title: `Edit ${item.title}`,
+    size: 'max-w-2xl',
+    body: `<form id="${formId}" class="grid grid-cols-1 sm:grid-cols-2 gap-x-4" enctype="multipart/form-data">
+      ${field({ name: 'kind', label: 'Content type', type: 'select', required: true, value: item.kind, options: CONTENT_KINDS })}
+      ${field({ name: 'title', label: 'Title', required: true, maxlength: 200, value: item.title, className: 'sm:col-span-2' })}
+      ${field({ name: 'description', label: 'Details', type: 'textarea', required: true, maxlength: 10000, value: item.description, className: 'sm:col-span-2' })}
+      ${field({ name: 'event_date', label: 'Event date', type: 'date', value: item.event_date })}
+      ${field({ name: 'event_end_date', label: 'Event end date', type: 'date', value: item.event_end_date })}
+      ${field({ name: 'location', label: 'Location', maxlength: 200, value: item.location })}
+      ${field({ name: 'documents_required', label: 'Documents needed', type: 'textarea', maxlength: 5000, value: item.documents_required, className: 'sm:col-span-2' })}
+      ${field({ name: 'scholarship_info', label: 'Scholarship information', type: 'textarea', maxlength: 5000, value: item.scholarship_info, className: 'sm:col-span-2' })}
+      ${field({ name: 'image', label: 'Replace photo', type: 'file', accept: 'image/jpeg,image/png,image/webp,image/gif' })}
+      ${field({ name: 'video', label: 'Replace video', type: 'file', accept: 'video/mp4,video/webm,video/quicktime' })}
+      ${field({ name: 'is_published', label: 'Published', type: 'checkbox', value: Boolean(item.is_published), className: 'sm:col-span-2' })}
+    </form>`,
+    footer: `<button type="button" data-cancel class="${btnClass('secondary')}">Cancel</button><button type="submit" form="${formId}" class="${btnClass('primary')}">Save changes</button>`,
+  });
+  modal.root.querySelector('[data-cancel]').addEventListener('click', modal.close);
+  modal.root.querySelector('form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+    const data = new FormData(form);
+    if (!data.get('is_published')) data.set('is_published', 'false');
+    const submit = modal.root.querySelector('button[type="submit"]');
+    setBusy(submit, true);
+    try {
+      await api.uploadPatch(`/school-content/${item.id}`, data);
+      modal.close();
+      toast('School content updated');
+      loadSchoolContent();
+    } catch (error) {
+      setBusy(submit, false);
+    }
+  });
+}
+
 async function loadSchoolContent() {
   const mount = document.getElementById('content-list');
   try {
@@ -53,6 +93,9 @@ async function loadSchoolContent() {
         loadSchoolContent();
       });
     });
+    mount.querySelectorAll('[data-edit-content]').forEach((button) => {
+      button.addEventListener('click', () => openContentEditForm(data.items.find((item) => item.id === Number(button.dataset.editContent))));
+    });
     refreshIcons();
   } catch (error) {
     showError(mount, error, loadSchoolContent);
@@ -67,6 +110,17 @@ async function loadAnnouncements() {
       ? `<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">${data.items.map(announcementCard).join('')}</div>`
       : card(emptyState({ iconName: 'megaphone', title: 'No announcements yet', subtitle: 'Create an announcement for school users.' }));
     refreshIcons();
+    mount.querySelectorAll('[data-edit-announcement]').forEach((button) => {
+      button.addEventListener('click', () => openAnnouncementForm(data.items.find((item) => item.id === Number(button.dataset.editAnnouncement))));
+    });
+    mount.querySelectorAll('[data-delete-announcement]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!(await confirmDialog({ title: 'Delete this announcement?', message: 'This cannot be undone.', confirmText: 'Delete' }))) return;
+        await api.del(`/announcements/${button.dataset.deleteAnnouncement}`);
+        toast('Announcement deleted');
+        loadAnnouncements();
+      });
+    });
   } catch (error) {
     showError(mount, error, loadAnnouncements);
   }
@@ -85,6 +139,10 @@ function announcementCard(item) {
           <h3 class="font-semibold text-ink">${escapeHtml(item.title)}</h3>
           ${item.is_expired ? badge('inactive', 'Expired') : badge('published', 'Published')}
         </div>
+        ${getUser()?.role === 'admin' ? `<div class="flex gap-1 ml-auto">
+          <button type="button" data-edit-announcement="${item.id}" class="${btnClass('ghost', 'icon-sm')}" title="Edit">${icon('pencil', 14)}</button>
+          <button type="button" data-delete-announcement="${item.id}" class="${btnClass('ghost', 'icon-sm')} text-danger" title="Delete">${icon('trash-2', 14)}</button>
+        </div>` : ''}
         <p class="text-sm text-slate-600 whitespace-pre-line mt-2">${escapeHtml(item.body)}</p>
         <p class="text-xs text-muted mt-3">${escapeHtml(audience)} · ${formatDateTime(item.published_at)}</p>
       </div>
@@ -92,7 +150,7 @@ function announcementCard(item) {
   </article>`;
 }
 
-async function openAnnouncementForm() {
+async function openAnnouncementForm(announcement = null) {
   let departments = [];
   try {
     departments = await loadDepartments();
@@ -101,20 +159,20 @@ async function openAnnouncementForm() {
     return;
   }
   const modal = formModal({
-    title: 'New announcement',
-    submitText: 'Publish announcement',
+    title: announcement ? 'Edit announcement' : 'New announcement',
+    submitText: announcement ? 'Save announcement' : 'Publish announcement',
     size: 'max-w-2xl',
     fieldsHtml: `
-      ${field({ name: 'title', label: 'Title', required: true, minlength: 3, maxlength: 150 })}
-      ${field({ name: 'expires_on', label: 'Expires on', type: 'date', min: todayISO() })}
-      ${field({ name: 'body', label: 'Announcement', type: 'textarea', required: true, minlength: 3, maxlength: 5000, className: 'sm:col-span-2' })}
-      ${field({ name: 'target_role', label: 'Audience role', type: 'select', emptyLabel: 'Everyone', options: [
+      ${field({ name: 'title', label: 'Title', required: true, minlength: 3, maxlength: 150, value: announcement?.title })}
+      ${field({ name: 'expires_on', label: 'Expires on', type: 'date', min: todayISO(), value: announcement?.expires_at?.slice(0, 10) })}
+      ${field({ name: 'body', label: 'Announcement', type: 'textarea', required: true, minlength: 3, maxlength: 5000, value: announcement?.body, className: 'sm:col-span-2' })}
+      ${field({ name: 'target_role', label: 'Audience role', type: 'select', emptyLabel: 'Everyone', value: announcement?.target_role, options: [
         { value: 'admin', label: 'Admins' }, { value: 'teacher', label: 'Teachers' },
         { value: 'student', label: 'Students' }, { value: 'accountant', label: 'Accountants' },
       ] })}
-      ${field({ name: 'target_department_id', label: 'Class group', type: 'select', number: true, emptyLabel: 'All class groups', options: toOptions(departments, (d) => d.code) })}`,
-    onSubmit: (values) => api.post('/announcements', values),
-    onSuccess: () => { toast('Announcement published'); loadAnnouncements(); },
+      ${field({ name: 'target_department_id', label: 'Class group', type: 'select', number: true, emptyLabel: 'All class groups', value: announcement?.target_department_id, options: toOptions(departments, (d) => d.code) })}`,
+    onSubmit: (values) => announcement ? api.patch(`/announcements/${announcement.id}`, values) : api.post('/announcements', values),
+    onSuccess: () => { toast(announcement ? 'Announcement updated' : 'Announcement published'); loadAnnouncements(); },
   });
   modal.form.classList.add('grid', 'grid-cols-1', 'sm:grid-cols-2', 'gap-x-4');
 }
@@ -134,7 +192,10 @@ function contentCard(item) {
     <div class="flex items-start justify-between gap-3 mb-3">
       <div><div class="flex gap-2 items-center">${badge(item.is_published ? 'published' : 'inactive', titleCase(item.kind))}${item.is_published ? '' : badge('inactive', 'Draft')}</div>
       <h3 class="font-semibold text-ink mt-2">${escapeHtml(item.title)}</h3></div>
-      ${getUser()?.role === 'admin' ? `<button type="button" data-delete-content="${item.id}" class="${btnClass('danger', 'sm')}">${icon('trash-2', 14)}</button>` : ''}
+      ${getUser()?.role === 'admin' ? `<div class="flex gap-1">
+        <button type="button" data-edit-content="${item.id}" class="${btnClass('ghost', 'icon-sm')}" title="Edit">${icon('pencil', 14)}</button>
+        <button type="button" data-delete-content="${item.id}" class="${btnClass('danger', 'icon-sm')}" title="Delete">${icon('trash-2', 14)}</button>
+      </div>` : ''}
     </div>
     ${media}<p class="text-sm text-slate-600 whitespace-pre-line">${escapeHtml(item.description)}</p>${event}
     ${extras ? `<div class="text-xs text-slate-600 space-y-1 mt-3">${extras}</div>` : ''}

@@ -12,7 +12,7 @@ from app.database import get_db, transaction
 from app.errors import found_or_404
 from app.pagination import list_params
 from app.repositories import school_content as repo
-from app.schemas.school_content import ContentKind, SchoolContentCreate
+from app.schemas.school_content import ContentKind, SchoolContentCreate, SchoolContentUpdate
 from app.security import get_current_user, require_role
 
 router = APIRouter(prefix="/school-content", tags=["school-content"])
@@ -111,3 +111,59 @@ def delete_school_content(
     for url in (content.get("image_url"), content.get("video_url")):
         _remove_saved_upload(url)
     return JSONResponse(status_code=204, content=None)
+
+
+@router.patch("/{content_id}")
+async def update_school_content(
+    content_id: int,
+    kind: ContentKind | None = Form(None),
+    title: str | None = Form(None, min_length=3, max_length=200),
+    description: str | None = Form(None, min_length=3, max_length=10000),
+    event_date: str | None = Form(None),
+    event_end_date: str | None = Form(None),
+    location: str | None = Form(None, max_length=200),
+    documents_required: str | None = Form(None, max_length=5000),
+    scholarship_info: str | None = Form(None, max_length=5000),
+    is_published: bool | None = Form(None),
+    image: UploadFile | None = File(None),
+    video: UploadFile | None = File(None),
+    user: dict = Depends(require_role("admin")),
+    conn: sqlite3.Connection = Depends(get_db),
+) -> dict:
+    current = found_or_404(repo.get_content(conn, content_id), "School content", content_id)
+    values = {
+        key: value for key, value in {
+            "kind": kind, "title": title, "description": description,
+            "event_date": event_date, "event_end_date": event_end_date,
+            "location": location, "documents_required": documents_required,
+            "scholarship_info": scholarship_info, "is_published": is_published,
+        }.items() if value is not None
+    }
+    if not values and image is None and video is None:
+        return current
+    merged = {**{key: current[key] for key in (
+        "kind", "title", "description", "event_date", "event_end_date", "location",
+        "documents_required", "scholarship_info", "is_published",
+    )}, **values}
+    SchoolContentUpdate(**merged)
+    new_image = await _save_upload(image, ALLOWED_IMAGE_TYPES, "image")
+    try:
+        new_video = await _save_upload(video, ALLOWED_VIDEO_TYPES, "video")
+    except HTTPException:
+        _remove_saved_upload(new_image)
+        raise
+    if new_image:
+        values["image_url"] = new_image
+    if new_video:
+        values["video_url"] = new_video
+    try:
+        with transaction(conn, user["id"]):
+            repo.update_content(conn, content_id, values)
+    except sqlite3.Error:
+        _remove_saved_upload(new_image)
+        _remove_saved_upload(new_video)
+        raise
+    for old, new in ((current.get("image_url"), new_image), (current.get("video_url"), new_video)):
+        if new:
+            _remove_saved_upload(old)
+    return repo.get_content(conn, content_id)

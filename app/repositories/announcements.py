@@ -64,3 +64,20 @@ def insert_announcement(conn: sqlite3.Connection, data: dict, posted_by: int) ->
         (data["title"], data["body"], posted_by, data.get("target_role"),
          data.get("target_department_id"), expires_at),
     )
+
+
+def update_announcement(conn: sqlite3.Connection, announcement_id: int, data: dict) -> int:
+    changes = {key: value for key, value in data.items() if key != "expires_on"}
+    if "expires_on" in data:
+        changes["expires_at"] = f"{data['expires_on']} 23:59:59" if data["expires_on"] else None
+    assignments = ", ".join(f"{key} = ?" for key in changes)
+    if not assignments:
+        return 0
+    return conn.execute(
+        f"UPDATE announcements SET {assignments} WHERE id = ?",
+        (*changes.values(), announcement_id),
+    ).rowcount
+
+
+def delete_announcement(conn: sqlite3.Connection, announcement_id: int) -> int:
+    return conn.execute("DELETE FROM announcements WHERE id = ?", (announcement_id,)).rowcount

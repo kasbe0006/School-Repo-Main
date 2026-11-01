@@ -55,3 +55,13 @@ def insert_content(conn: sqlite3.Connection, data: dict, created_by: int) -> int
 
 def delete_content(conn: sqlite3.Connection, content_id: int) -> int:
     return conn.execute("DELETE FROM school_content WHERE id = ?", (content_id,)).rowcount
+
+
+def update_content(conn: sqlite3.Connection, content_id: int, changes: dict) -> int:
+    if not changes:
+        return 0
+    assignments = ", ".join(f"{key} = ?" for key in changes)
+    return conn.execute(
+        f"UPDATE school_content SET {assignments} WHERE id = ?",
+        (*changes.values(), content_id),
+    ).rowcount

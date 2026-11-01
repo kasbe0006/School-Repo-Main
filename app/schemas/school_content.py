@@ -25,3 +25,7 @@ class SchoolContentCreate(BaseModel):
         if self.event_date and self.event_end_date and self.event_end_date < self.event_date:
             raise ValueError("event_end_date cannot be before event_date")
         return self
+
+
+class SchoolContentUpdate(SchoolContentCreate):
+    """Validated school-content fields used by the edit endpoint."""

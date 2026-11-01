@@ -50,7 +50,7 @@ function showInvoices(panel, ctx) {
     defaultOrder: 'desc',
     initialFilters: { semester_id: ctx.activeId },
     filters: [
-      { name: 'semester_id', label: 'Semester', options: ctx.semesterOptions },
+      { name: 'semester_id', label: 'Academic term', options: ctx.semesterOptions },
       { name: 'status', label: 'Status', options: ['unpaid', 'partial', 'paid', 'overdue'].map((s) => ({ value: s, label: titleCase(s) })) },
       { name: 'department_id', label: 'Department', options: ctx.departmentOptions },
     ],
@@ -60,7 +60,7 @@ function showInvoices(panel, ctx) {
     columns: [
       { key: 'invoice_no', label: 'Invoice', sortable: true, className: 'font-medium text-ink whitespace-nowrap' },
       { key: 'student_name', label: 'Student', sortable: true, render: (r) => `<p class="text-ink">${escapeHtml(r.student_name)}</p><p class="text-xs text-muted">${escapeHtml(r.student_code)}</p>` },
-      { key: 'semester_code', label: 'Semester', sortable: true },
+      { key: 'semester_code', label: 'Academic term', sortable: true },
       { key: 'total_amount', label: 'Total', sortable: true, className: 'text-right tabular-nums whitespace-nowrap', headerClass: 'text-right', render: (r) => formatMoney(r.total_amount) },
       { key: 'paid_amount', label: 'Paid', sortable: true, className: 'text-right tabular-nums whitespace-nowrap', headerClass: 'text-right', render: (r) => formatMoney(r.paid_amount) },
       { key: 'due_amount', label: 'Due', sortable: true, className: 'text-right tabular-nums whitespace-nowrap', headerClass: 'text-right',
@@ -98,7 +98,7 @@ function showPayments(panel, ctx) {
     defaultOrder: 'desc',
     initialFilters: { semester_id: ctx.activeId },
     filters: [
-      { name: 'semester_id', label: 'Semester', options: ctx.semesterOptions },
+      { name: 'semester_id', label: 'Academic term', options: ctx.semesterOptions },
       { name: 'method', label: 'Method', options: PAYMENT_METHODS.map((m) => ({ value: m, label: titleCase(m) })) },
     ],
     emptyIcon: 'wallet',
@@ -132,7 +132,7 @@ function showFees(panel, ctx) {
     emptyIcon: 'wallet',
     emptyTitle: 'No fee structures',
     columns: [
-      { key: 'semester_code', label: 'Semester', sortable: true },
+      { key: 'semester_code', label: 'Academic term', sortable: true },
       { key: 'department_code', label: 'Applies to', sortable: true, render: (r) => (r.department_id ? badge('info', r.department_code) : badge('completed', 'All departments')) },
       { key: 'fee_type', label: 'Fee type', sortable: true, render: (r) => `<span class="text-ink">${escapeHtml(titleCase(r.fee_type))}</span>` },
       { key: 'amount', label: 'Amount', sortable: true, className: 'text-right tabular-nums font-medium text-ink', headerClass: 'text-right', render: (r) => formatMoney(r.amount) },
@@ -144,7 +144,7 @@ function showFees(panel, ctx) {
       title: 'New fee',
       submitText: 'Create fee',
       fieldsHtml: `
-        ${field({ name: 'semester_id', label: 'Semester', type: 'select', number: true, required: true, value: ctx.activeId, options: ctx.semesterOptions })}
+        ${field({ name: 'semester_id', label: 'Academic term', type: 'select', number: true, required: true, value: ctx.activeId, options: ctx.semesterOptions })}
         ${field({ name: 'department_id', label: 'Department', type: 'select', number: true, emptyLabel: 'All departments', options: ctx.departmentOptions,
                   help: 'A department fee replaces the "all departments" fee of the same type' })}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">

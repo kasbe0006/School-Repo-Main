@@ -8,3 +8,9 @@
   to = "https://surround-tsunami-holmes-develops.trycloudflare.com/api/:splat"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/media/*"
+  to = "https://surround-tsunami-holmes-develops.trycloudflare.com/media/:splat"
+  status = 200
+  force = true

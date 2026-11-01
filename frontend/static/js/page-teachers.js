@@ -120,7 +120,7 @@ async function openTeacherDrawer(teacher) {
         columns: [
           { key: 'semester_code', label: 'Semester' },
           { key: 'course_count', label: 'Courses', className: 'tabular-nums' },
-          { key: 'total_credits', label: 'Credits', className: 'tabular-nums' },
+          { key: 'total_credits', label: 'Subject load', className: 'tabular-nums' },
           { key: 'total_students', label: 'Students', className: 'tabular-nums' },
         ],
         rows: data.per_semester,

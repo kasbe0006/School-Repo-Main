@@ -35,17 +35,13 @@ async function initCourses({ user, content }) {
       { key: 'is_active', label: 'Status', render: (r) => badge(r.is_active ? 'active' : 'inactive') },
       { key: 'actions', label: '', className: 'text-right whitespace-nowrap', render: () => (isAdmin ? rowAction('edit', 'pencil', 'Edit') : '') },
     ],
-    onRowClick: (row) => (isAdmin ? openCourseForm(row) : goToTree(row)),
+    onRowClick: (row) => (isAdmin ? openCourseForm(row) : undefined),
     onAction: (action, row) => {
       if (action === 'edit') openCourseForm(row);
     },
   });
 
   document.getElementById('new-course')?.addEventListener('click', () => openCourseForm(null));
-
-  function goToTree(course) {
-    window.location.href = `/pages/course-tree.html?id=${course.id}`;
-  }
 
   function openCourseForm(course) {
     const isEdit = Boolean(course);

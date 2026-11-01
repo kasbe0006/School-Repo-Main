@@ -13,7 +13,7 @@ async function initRoutine({ user, content }) {
   const isAdmin = user.role === 'admin' || user.role === 'accountant';
   const description = {
     student: 'Your classes this week.', teacher: 'Your teaching schedule this week.',
-  }[user.role] || 'All classes of the week. Filter by semester, department or room.';
+  }[user.role] || 'All classes of the week. Filter by academic term, school unit or room.';
 
   content.innerHTML = `
     ${pageHeader('Weekly routine', description)}

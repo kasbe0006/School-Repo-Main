@@ -59,7 +59,6 @@ const NAV_SECTIONS = [
     { page: 'gradebook', label: 'Gradebook', icon: 'table', roles: ['admin', 'teacher'] },
   ] },
   { label: 'My Studies', items: [
-    { page: 'enrollment', label: 'Subject Enrollment', icon: 'clipboard-list', roles: ['student'] },
     { page: 'student-detail', label: 'My Record', icon: 'user-round', roles: ['student'] },
   ] },
   { label: 'Finance', items: [
@@ -316,7 +315,7 @@ function renderLayout(activePage, title, user) {
   // Active semester pill (fills in when the request returns)
   loadActiveSemester().then((semester) => {
     const pill = document.querySelector('#semester-pill span');
-    if (pill) pill.textContent = semester ? `${semester.code} · Active` : 'No active semester';
+    if (pill) pill.textContent = semester ? `${semester.code} · Active term` : 'No active term';
   });
 
   refreshIcons();
@@ -1071,7 +1070,7 @@ function openInvoiceModal(invoiceId, { canPay = false, onChange } = {}) {
       <div class="flex flex-wrap items-start justify-between gap-3 mb-5">
         <div>
           <p class="text-sm font-medium text-ink">${escapeHtml(inv.student_name)} <span class="text-muted font-normal">· ${escapeHtml(inv.student_code)}</span></p>
-          <p class="text-xs text-muted mt-1">Semester ${escapeHtml(inv.semester_code)} · Issued ${formatDate(inv.issued_at)} · Due ${formatDate(inv.due_date)}</p>
+          <p class="text-xs text-muted mt-1">Academic term ${escapeHtml(inv.semester_code)} · Issued ${formatDate(inv.issued_at)} · Due ${formatDate(inv.due_date)}</p>
         </div>
         ${badge(inv.status)}
       </div>

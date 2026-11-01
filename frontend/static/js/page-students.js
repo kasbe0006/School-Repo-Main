@@ -38,7 +38,7 @@ async function initStudents({ content }) {
           <div class="min-w-[160px]"><p class="font-medium text-ink">${escapeHtml(r.full_name)}</p><p class="text-xs text-muted">${escapeHtml(r.email)}</p></div>` },
       { key: 'department_code', label: 'School unit', sortable: true },
       { key: 'admission_date', label: 'Admitted', sortable: true, render: (r) => formatDate(r.admission_date), className: 'whitespace-nowrap' },
-      { key: 'cgpa', label: 'CGPA', sortable: true, className: 'tabular-nums', render: (r) => (r.cgpa === null ? '<span class="text-muted">—</span>' : Number(r.cgpa).toFixed(2)) },
+      { key: 'cgpa', label: 'Average', sortable: true, className: 'tabular-nums', render: (r) => (r.cgpa === null ? '<span class="text-muted">—</span>' : Number(r.cgpa).toFixed(2)) },
       { key: 'status', label: 'Status', sortable: true, render: (r) => badge(r.status) },
       { key: 'go', label: '', className: 'text-right text-slate-300', render: () => icon('chevron-right', 16) },
     ],

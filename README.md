@@ -44,9 +44,10 @@ It has role-based portals and a database layer that enforces its own business ru
 
 ## Overview
 
-School ERP covers the daily lifecycle of a school year in one application: administrators set up
-classes, subjects, rooms and offerings; students register for courses; teachers take attendance
-and publish grades; and accountants bill and collect fees.
+School ERP is customized for ZPPS Mamdapur: administrators manage classes, sections, students,
+teachers and subjects; teachers take attendance and publish grades; accountants manage fees; and
+school staff can publish notices, activities, photos, videos, admission requirements and
+scholarship information.
 
 The core design choice is that **data integrity lives in the database, not only in the
 application code.** Over-full classes, double-booked rooms, marks above the maximum, over-paid
@@ -61,22 +62,20 @@ audit trail by the database. The rules still hold for writes that bypass the API
 | Frontend | HTML, vanilla JavaScript, Tailwind CSS, Chart.js, Lucide icons. No build step. |
 | Quality | Automated pytest coverage, including multi-threaded race-condition and authentication protection tests |
 
-**At a glance:** 21 normalized tables · 34 triggers · 5 views · 26 indexes · 70 REST endpoints ·
-18 responsive pages · 4 user roles · about 89,000 rows of realistic demo data.
+**At a glance:** 22 normalized tables · 35 triggers · 5 views · 26 indexes · 70 REST endpoints ·
+19 responsive pages · 4 user roles · about 89,000 rows of realistic demo data.
 
 ---
 
 ## Key features
 
 ### For each role
-- **Admin:** manage departments, teachers, students (a 2-step onboarding form), courses with
-  prerequisite chains, rooms and semesters; schedule offerings with automatic clash detection;
-  close a semester in one atomic operation; browse the full audit trail.
+- **Admin:** manage classes and sections, teachers, students (a 2-step onboarding form), subjects,
+  rooms and academic terms; filter students by class and section; schedule class subjects with
+  automatic clash detection; publish school content and browse the full audit trail.
 - **Teacher:** weekly timetable, bulk attendance entry, a gradebook with live weighted totals,
   one-click grade finalization, and class analytics (grade distribution, low-attendance alerts).
-- **Student:** self-service enrollment where every unavailable course shows *why* (full,
-  prerequisite missing, credit limit…), plus a transcript with semester GPA and CGPA,
-  attendance summary and outstanding dues.
+- **Student:** view their subjects, timetable, attendance summary, progress report and outstanding dues.
 - **Accountant:** fee structures with department-level overrides, invoice generation for a single
   student or a whole semester, payment recording (cash, bank, bKash, Nagad, card) and collection
   reports.
@@ -89,8 +88,8 @@ Every signed-in user can change their password from the key icon in the top navi
 
 | | |
 |---|---|
-| **Student: enrollment**. Every rule is checked by the server, and disabled buttons show the reason. ![](docs/screenshots/student-enrollment.png) | **Teacher: gradebook**. Editable marks with a live weighted total. ![](docs/screenshots/teacher-gradebook.png) |
-| **Prerequisite tree**, built from one recursive query. ![](docs/screenshots/prerequisite-tree.png) | **Audit log**, written automatically by database triggers. ![](docs/screenshots/audit-log.png) |
+| **School information**. Notices, activities, gallery media, admission requirements and scholarships. | **Teacher: gradebook**. Editable marks with a live weighted total. ![](docs/screenshots/teacher-gradebook.png) |
+| **Student record**. Class, section, attendance and progress information. | **Audit log**, written automatically by database triggers. ![](docs/screenshots/audit-log.png) |
 | **Offerings**: seat fill and schedules. ![](docs/screenshots/admin-offerings.png) | **Weekly routine**. ![](docs/screenshots/weekly-routine.png) |
 | **Teacher: attendance**. Bulk save in a single transaction. ![](docs/screenshots/teacher-attendance.png) | **Accountant: billing**. ![](docs/screenshots/accountant-billing.png) |
 | **Reports and analytics**. ![](docs/screenshots/reports.png) | **Mobile (375 px)**. ![](docs/screenshots/mobile-student-dashboard.png) |
@@ -299,13 +298,13 @@ All endpoints are under `/api` and documented in Swagger UI at `/docs`.
 | Auth | `POST /auth/login`, `GET /auth/me`, `POST /auth/change-password` |
 | Dashboard | `GET /dashboard/stats` (role-specific) |
 | People | departments, teachers, students: list / create / get / update · `GET /teachers/{id}/workload` · `GET /students/{id}/transcript`, `/dues`, `/attendance` |
-| Catalogue | courses: list / create / get / update · `POST /courses/{id}/prerequisites` (cycle-checked) · `GET /courses/{id}/prerequisite-tree` |
+| Catalogue | subjects: list / create / get / update |
 | Rooms and semesters | list / create / get / update · `GET /semesters/active` · `PATCH /semesters/{id}/activate` · `POST /semesters/{id}/close` |
 | Offerings and schedules | list / create / get / update · `GET /offerings/{id}/roster` · `POST /offerings/{id}/schedules` · `DELETE /schedules/{id}` · `GET /schedules/weekly` |
-| Enrollment | `POST /enrollments` · `GET /enrollments` · `GET /enrollments/eligibility` · `PATCH /enrollments/{id}/drop` · `POST /enrollments/{id}/finalize-grade` |
+| Class records | `POST /enrollments` · `GET /enrollments` · `PATCH /enrollments/{id}/drop` · `POST /enrollments/{id}/finalize-grade` |
 | Attendance and assessments | `POST`/`GET /offerings/{id}/attendance` · `GET /offerings/{id}/attendance-report` · `POST /assessments` · `POST /assessments/{id}/results` · `GET /offerings/{id}/gradebook` |
 | Billing | `GET`/`POST /fee-structures` · `POST /invoices/generate` · `GET /invoices`, `/invoices/{id}` · `GET`/`POST /payments` |
-| Communication and audit | `GET`/`POST /announcements` · `GET /audit-logs` |
+| School content and audit | `GET /school-content/public` · `GET`/`POST /school-content` · `DELETE /school-content/{id}` · `GET /audit-logs` |
 | Reports | `GET /reports/grade-distribution`, `/department-performance` (+ refresh), `/collection-summary`, `/low-attendance` |
 
 ---

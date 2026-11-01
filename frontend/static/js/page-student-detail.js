@@ -2,7 +2,7 @@
  * page-student-detail.js: one student's full record.
  *   Admin:   /pages/student-detail.html?id=12
  *   Student: /pages/student-detail.html   (always their own record)
- * Tabs: Profile · Enrollments · Attendance · Transcript · Dues
+ * Tabs: Profile · Subjects · Attendance · Progress report · Dues
  */
 
 const TABS = [

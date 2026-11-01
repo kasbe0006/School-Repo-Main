@@ -52,7 +52,7 @@ contact details from School Settings.
 
 The core design choice is that **data integrity lives in the database, not only in the
 application code.** Over-full classes, double-booked rooms, marks above the maximum, over-paid
-invoices and a second active semester are rejected by SQLite itself, through constraints,
+invoices and a second active school year are rejected by SQLite itself, through constraints,
 triggers and partial unique indexes. Every change to enrollments and payments is written to an
 audit trail by the database. The rules still hold for writes that bypass the API.
 
@@ -63,8 +63,8 @@ audit trail by the database. The rules still hold for writes that bypass the API
 | Frontend | HTML, vanilla JavaScript, Tailwind CSS, Chart.js, Lucide icons. No build step. |
 | Quality | Automated pytest coverage, including multi-threaded race-condition and authentication protection tests |
 
-**At a glance:** 23 normalized tables · 36 triggers · 5 views · 26 indexes · 72 REST endpoints ·
-14 responsive school pages · staff-focused role-based access.
+**At a glance:** 23 normalized tables · 36 triggers · 5 views · 26 indexes · 83 REST endpoints ·
+15 responsive school pages · staff-focused role-based access.
 
 ---
 
@@ -274,15 +274,15 @@ their first login. Imports accept up to 500 students and fail as a whole if any 
 pytest -q
 ```
 
-**321 tests, all passing**. Each test runs against its own fresh database
+**333 tests, all passing**. Each test runs against its own fresh database
 file, so the suite is isolated and can run in any order.
 
 | Suite | Tests | Coverage |
 |---|---|---|
-| `test_constraints.py` | 94 | Every CHECK, UNIQUE and foreign-key rule rejects invalid data; cascade, restrict and set-null behaviour; valid edge cases are still accepted |
+| `test_constraints.py` | 96 | Every CHECK, UNIQUE and foreign-key rule rejects invalid data; cascade, restrict and set-null behaviour; valid edge cases are still accepted |
 | `test_triggers.py` | 29 | Timestamps, seat counters, marks validation, invoice recomputation, audit entries with the correct actor, schedule clashes |
 | `test_services.py` | 55 | All 10 business services, including each of the 7 enrollment rejection reasons; a rejected operation leaves the database byte-for-byte unchanged |
-| `test_api.py` | 129 | A permission matrix for **every** endpoint (401 / 403 / allowed), record-ownership rules, authentication, end-to-end flows, error formats, SQL-injection-safe sorting, smoke tests on the full demo data |
+| `test_api.py` | 144 | A permission matrix for **every** endpoint (401 / 403 / allowed), record-ownership rules, authentication, end-to-end flows, error formats, SQL-injection-safe sorting, smoke tests on the full demo data |
 | `test_concurrency.py` | 9 | Parallel threads racing for the last seat: exactly one wins, every time; locking and isolation behaviour |
 
 The frontend was also verified in a headless browser: all 18 pages for every role, at desktop
@@ -303,11 +303,11 @@ All endpoints are under `/api` and documented in Swagger UI at `/docs`.
 
 | Area | Endpoints |
 |---|---|
-| Auth | `POST /auth/login`, `GET /auth/me`, `POST /auth/change-password` |
+| Auth | `POST /auth/login`, `GET /auth/me`, `POST /auth/change-password`, `POST /auth/accountants` (admin) |
 | Dashboard | `GET /dashboard/stats` (role-specific) |
 | People | departments, teachers, students: list / create / get / update · `GET /teachers/{id}/workload` · `GET /students/{id}/transcript`, `/dues`, `/attendance` |
 | Catalogue | subjects: list / create / get / update |
-| Rooms and semesters | list / create / get / update · `GET /semesters/active` · `PATCH /semesters/{id}/activate` · `POST /semesters/{id}/close` |
+| School years and rooms | list / create / get / update · `GET /semesters/active` · `PATCH /semesters/{id}/activate` · `POST /semesters/{id}/close` |
 | Offerings and schedules | list / create / get / update · `GET /offerings/{id}/roster` · `POST /offerings/{id}/schedules` · `DELETE /schedules/{id}` · `GET /schedules/weekly` |
 | Class records | `POST /enrollments` · `GET /enrollments` · `PATCH /enrollments/{id}/drop` · `POST /enrollments/{id}/finalize-grade` |
 | Attendance and assessments | `POST`/`GET /offerings/{id}/attendance` · `GET /offerings/{id}/attendance-report` · `POST /assessments` · `POST /assessments/{id}/results` · `GET /offerings/{id}/gradebook` |
@@ -321,7 +321,7 @@ All endpoints are under `/api` and documented in Swagger UI at `/docs`.
 
 | Capability | Admin | Teacher | Student | Accountant |
 |---|:-:|:-:|:-:|:-:|
-| Manage departments, people, courses, rooms, semesters, offerings | ✔ | | | |
+| Manage departments, people, subjects, school years, rooms, offerings | ✔ | | | |
 | View timetable, course catalogue, prerequisite tree | ✔ | ✔ | ✔ | ✔ |
 | Attendance, marks, grade finalization | ✔ | own classes | | |
 | Enroll and drop | ✔ | | self only | |

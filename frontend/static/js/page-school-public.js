@@ -37,6 +37,9 @@ async function loadPublicContent() {
     const config = await configResponse.json();
     const content = await contentResponse.json();
     document.title = config.school_short_name;
+    document.querySelectorAll('link[rel~="icon"]').forEach((el) => {
+      if (config.logo_url) el.href = config.logo_url;
+    });
     document.querySelectorAll('[data-school-name]').forEach((el) => { el.textContent = config.school_name; });
     document.querySelectorAll('[data-school-tagline]').forEach((el) => { el.textContent = config.school_tagline; });
     document.querySelectorAll('[data-school-logo]').forEach((el) => {

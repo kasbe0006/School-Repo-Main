@@ -3,7 +3,7 @@ Start UCMS with one command:
 
     python run.py
 
-- If ucms.db does not exist yet (or is empty), it is created and filled with demo data first.
+- If ucms.db does not exist yet (or is empty), it is created with the school schema.
 - Then the web server starts at http://localhost:8000 (API docs at /docs).
 """
 
@@ -21,7 +21,7 @@ from app.repositories.users import insert_user  # noqa: E402
 from app.security import hash_password  # noqa: E402
 from scripts.init_db import init_database, list_tables  # noqa: E402
 from scripts.migrate_school import migrate_school_schema  # noqa: E402
-from scripts.seed import DEMO_PASSWORD, seed_database  # noqa: E402
+from scripts.seed import seed_database  # noqa: E402
 
 
 def ensure_database() -> None:
@@ -70,9 +70,6 @@ def main() -> None:
     ensure_database()
     host_for_link = "localhost" if config.HOST in ("127.0.0.1", "0.0.0.0") else config.HOST
     print(f"\nSchool ERP is running at http://{host_for_link}:{config.PORT}   (API docs: /docs)")
-    if config.AUTO_SEED:
-        print(f"Demo logins (password {DEMO_PASSWORD}): admin@ucms.edu, teacher@ucms.edu, "
-              "student@ucms.edu, accountant@ucms.edu\n")
     uvicorn.run("app.main:app", host=config.HOST, port=config.PORT)
 
 

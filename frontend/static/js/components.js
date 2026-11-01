@@ -109,12 +109,19 @@ function loadBranding() {
     document.querySelectorAll('[data-school-name]').forEach((el) => { el.textContent = branding.school_name; });
     document.querySelectorAll('[data-school-short-name]').forEach((el) => { el.textContent = branding.school_short_name; });
     document.querySelectorAll('[data-school-tagline]').forEach((el) => { el.textContent = branding.school_tagline; });
+    document.querySelectorAll('link[rel~="icon"]').forEach((el) => {
+      if (branding.logo_url) el.href = branding.logo_url;
+    });
     document.querySelectorAll('[data-school-logo]').forEach((el) => {
       if (branding.logo_url) {
         el.src = branding.logo_url;
         el.classList.remove('hidden');
-        document.querySelectorAll('[data-default-school-logo]').forEach((logo) => logo.classList.add('hidden'));
+      } else {
+        el.classList.add('hidden');
       }
+    });
+    document.querySelectorAll('[data-default-school-logo]').forEach((logo) => {
+      logo.classList.toggle('hidden', Boolean(branding.logo_url));
     });
     return branding;
   }).catch(() => branding);
@@ -272,9 +279,8 @@ function renderLayout(activePage, title, user) {
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-line flex flex-col
                                -translate-x-full lg:translate-x-0 transition-transform duration-200">
       <div class="h-16 shrink-0 flex items-center gap-2.5 px-5 border-b border-line">
-        ${branding.logo_url
-          ? `<img data-school-logo src="${escapeHtml(branding.logo_url)}" alt="" class="w-8 h-8 rounded-lg object-cover">`
-          : LOGO_SVG}
+        <span data-default-school-logo class="${branding.logo_url ? 'hidden' : ''}">${LOGO_SVG}</span>
+        <img data-school-logo src="${branding.logo_url ? escapeHtml(branding.logo_url) : ''}" alt="" class="w-8 h-8 rounded-lg object-cover ${branding.logo_url ? '' : 'hidden'}">
         <span data-school-short-name class="text-lg font-semibold tracking-tight text-primary-600">${escapeHtml(branding.school_short_name)}</span>
         <button id="drawer-close" class="${btnClass('ghost', 'icon-sm')} ml-auto lg:hidden" aria-label="Close menu">${icon('x', 18)}</button>
       </div>

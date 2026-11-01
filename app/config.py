@@ -55,7 +55,7 @@ JWT_EXPIRE_HOURS: int = int(os.getenv("JWT_EXPIRE_HOURS", "8"))
 
 # ---- Runtime environment ----
 ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development").strip().lower()
-AUTO_SEED: bool = os.getenv("AUTO_SEED", "true").strip().lower() in {"1", "true", "yes", "on"}
+AUTO_SEED: bool = os.getenv("AUTO_SEED", "false").strip().lower() in {"1", "true", "yes", "on"}
 PROVISION_ADMIN_EMAIL: str = os.getenv("PROVISION_ADMIN_EMAIL", "").strip().lower()
 PROVISION_ADMIN_PASSWORD: str = os.getenv("PROVISION_ADMIN_PASSWORD", "")
 SCHOOL_NAME: str = os.getenv("SCHOOL_NAME", "Zilla Parishad Primary School, Mamdapur")

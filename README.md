@@ -170,9 +170,10 @@ python run.py
 Open **http://localhost:8000**. The health check is at **/health** and the interactive API documentation (Swagger UI) is at
 **http://localhost:8000/docs**.
 
-On first start the database is created and filled with deterministic demo data: 300 students,
-30 teachers, 60 courses, 4 semesters, about 3,000 enrollments, 62,000 attendance records and
-1,800 payments. To rebuild it at any time, run `python scripts/seed.py --reset`.
+On first start the database is created empty. Set `PROVISION_ADMIN_EMAIL` and
+`PROVISION_ADMIN_PASSWORD` (at least 12 characters) to create the first administrator.
+The optional `scripts/seed.py` utility is for automated testing only; do not use it for the
+live school database.
 
 ### Deploy to Render
 
@@ -248,18 +249,8 @@ The free Render plan is not suitable for real records because its filesystem is 
 Starter plan is the minimum safe option here because this application uses SQLite and needs a
 persistent disk. The Render subdomain is free; a custom domain is optional later.
 
-Do not use the demo accounts or enter real student data until the administrator has changed all
-initial settings.
-
-### Demo accounts
-All passwords: **`Password123!`**
-
-| Role | Email |
-|---|---|
-| Admin | `admin@ucms.edu` |
-| Teacher | `teacher@ucms.edu` |
-| Student | `student@ucms.edu` |
-| Accountant | `accountant@ucms.edu` |
+The login page does not expose demo accounts. Create all staff and student accounts from the
+administrator portal using real school records.
 
 ---
 
@@ -341,7 +332,7 @@ Settings are read from environment variables or from a `.env` file (see `.env.ex
 | `JWT_SECRET` | `dev-secret-change-me` | Token signing key. Set a long random value in production. |
 | `JWT_EXPIRE_HOURS` | `8` | Session length |
 | `ENVIRONMENT` | `development` | Runtime mode; production rejects unsafe defaults |
-| `AUTO_SEED` | `true` | Seed demo data automatically; set to `false` in production |
+| `AUTO_SEED` | `false` | Keep false for the live school database |
 | `LOGIN_MAX_FAILURES` | `5` | Failed attempts allowed per IP/email before temporary blocking |
 | `LOGIN_FAILURE_WINDOW_SECONDS` | `300` | Failed-login blocking window |
 | `HOST` / `PORT` | `127.0.0.1` / `8000` | Server address |

@@ -56,7 +56,7 @@ def main() -> int:
 
     init_database(db_path)
     print_summary(db_path)
-    print("\nDatabase reset complete. Run `python scripts/seed.py` to add demo data.")
+    print("\nDatabase reset complete. Set PROVISION_ADMIN_EMAIL and PROVISION_ADMIN_PASSWORD before starting.")
     return 0
 
 

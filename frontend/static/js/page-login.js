@@ -7,12 +7,6 @@ if (getToken() && getUser()) {
   window.location.replace(homePageFor(getUser().role));
 }
 
-const DEMO_ACCOUNTS = [
-  { email: 'admin@ucms.edu', role: 'Admin', iconName: 'shield-check' },
-  { email: 'teacher@ucms.edu', role: 'Teacher', iconName: 'users' },
-  { email: 'accountant@ucms.edu', role: 'Accountant', iconName: 'wallet' },
-];
-
 const form = document.getElementById('login-form');
 const errorBox = document.getElementById('login-error');
 const button = document.getElementById('login-button');
@@ -27,22 +21,6 @@ function showLoginError(message) {
 }
 
 if (queryParam('expired')) showLoginError('Your session has expired. Please sign in again.');
-
-// Demo account buttons fill in the form
-document.getElementById('demo-accounts').innerHTML = DEMO_ACCOUNTS.map((account) => `
-  <button type="button" data-email="${account.email}"
-          class="flex items-center gap-2 h-9 px-3 rounded-lg border border-line bg-white text-left hover:bg-slate-50">
-    <span class="text-primary-600">${icon(account.iconName, 16)}</span>
-    <span class="min-w-0"><span class="block text-xs font-medium text-ink">${account.role}</span></span>
-  </button>`).join('');
-document.querySelectorAll('[data-email]').forEach((demo) => {
-  demo.addEventListener('click', () => {
-    form.email.value = demo.dataset.email;
-    form.password.value = 'Password123!';
-    form.password.focus();
-  });
-});
-refreshIcons();
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();

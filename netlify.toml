@@ -1,2 +1,4 @@
 [build]
-  publish = "frontend"
+  base = "frontend"
+  publish = "."
+  command = "echo Publishing static frontend"

@@ -3,6 +3,7 @@
 *.db-wal
 *.db-shm
 backups/
+media/
 
 # Local settings
 .env

@@ -21,6 +21,27 @@
 
 
 -- ---------------------------------------------------------------------
+-- T22 school_settings : the editable identity of this single school
+-- ---------------------------------------------------------------------
+CREATE TABLE school_settings (
+    id               INTEGER PRIMARY KEY CHECK (id = 1),
+    school_name      TEXT NOT NULL,
+    school_short_name TEXT NOT NULL,
+    school_tagline   TEXT NOT NULL,
+    school_address   TEXT NOT NULL DEFAULT '',
+    school_phone     TEXT NOT NULL DEFAULT '',
+    school_email     TEXT NOT NULL DEFAULT '',
+    logo_url         TEXT NULL,
+    updated_at       TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+INSERT INTO school_settings
+    (id, school_name, school_short_name, school_tagline)
+VALUES
+    (1, 'Zilla Parishad Primary School, Mamdapur',
+     'ZPPS Mamdapur', 'School management for ZPPS Mamdapur');
+
+-- ---------------------------------------------------------------------
 -- T1 users : login accounts for all 4 roles
 -- ---------------------------------------------------------------------
 CREATE TABLE users (

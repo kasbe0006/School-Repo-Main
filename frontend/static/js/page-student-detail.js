@@ -2,15 +2,13 @@
  * page-student-detail.js: one student's full record.
  *   Admin:   /pages/student-detail.html?id=12
  *   Student: /pages/student-detail.html   (always their own record)
- * Tabs: Profile · Subjects · Attendance · Progress report · Dues
+ * Tabs: Profile · Attendance · Fees
  */
 
 const TABS = [
   { key: 'profile', label: 'Profile' },
-  { key: 'enrollments', label: 'Enrollments' },
   { key: 'attendance', label: 'Attendance' },
-  { key: 'transcript', label: 'Transcript' },
-  { key: 'dues', label: 'Dues' },
+  { key: 'dues', label: 'Fees' },
 ];
 
 function initStudentDetail({ user, content }) {
@@ -60,9 +58,9 @@ function initStudentDetail({ user, content }) {
           </div>
           <p class="text-sm text-muted mt-0.5">${escapeHtml(student.student_code)} · Class ${escapeHtml(String(student.grade_level))}-${escapeHtml(student.section)} · ${escapeHtml(student.email)}</p>
         </div>
-        <div class="flex gap-6 sm:text-right">
-          <div><p class="text-xs uppercase tracking-wide text-muted">CGPA</p><p class="text-2xl font-semibold text-ink">${student.cgpa === null ? '—' : Number(student.cgpa).toFixed(2)}</p></div>
-          <div><p class="text-xs uppercase tracking-wide text-muted">Admitted</p><p class="text-sm font-medium text-ink mt-2">${formatDate(student.admission_date)}</p></div>
+        <div class="sm:text-right">
+          <p class="text-xs uppercase tracking-wide text-muted">Admitted</p>
+          <p class="text-sm font-medium text-ink mt-2">${formatDate(student.admission_date)}</p>
         </div>
       </div>`);
   }
@@ -70,7 +68,7 @@ function initStudentDetail({ user, content }) {
   function showTab(key) {
     history.replaceState(null, '', `#${key}`);
     const body = document.getElementById('tab-body');
-    const loaders = { profile: showProfile, enrollments: showEnrollments, attendance: showAttendance, transcript: showTranscript, dues: showDues };
+    const loaders = { profile: showProfile, attendance: showAttendance, dues: showDues };
     loaders[key](body);
   }
 
@@ -156,7 +154,7 @@ function initStudentDetail({ user, content }) {
       }
       body.innerHTML = `<div class="bg-white rounded-xl border border-line shadow-sm overflow-hidden">${renderTable({
         columns: [
-          { key: 'semester_code', label: 'Semester' },
+          { key: 'semester_code', label: 'School year' },
           { key: 'course_code', label: 'Course', render: (r) => `<p class="font-medium text-ink">${escapeHtml(r.course_code)}-${escapeHtml(r.section)}</p><p class="text-xs text-muted">${escapeHtml(r.course_title)}</p>` },
           { key: 'teacher_name', label: 'Teacher' },
           { key: 'credits', label: 'Credits', className: 'tabular-nums' },
@@ -192,7 +190,7 @@ function initStudentDetail({ user, content }) {
       }
       body.innerHTML = `<div class="bg-white rounded-xl border border-line shadow-sm overflow-hidden">${renderTable({
         columns: [
-          { key: 'semester_code', label: 'Semester' },
+          { key: 'semester_code', label: 'School year' },
           { key: 'course_code', label: 'Course', render: (r) => `<p class="font-medium text-ink">${escapeHtml(r.course_code)}-${escapeHtml(r.section)}</p><p class="text-xs text-muted">${escapeHtml(r.title)}</p>` },
           { key: 'attended', label: 'Attended', className: 'tabular-nums whitespace-nowrap', render: (r) => `${r.present_count} / ${r.total_classes}` },
           { key: 'breakdown', label: 'Absent · Late · Excused', className: 'tabular-nums text-xs text-muted whitespace-nowrap', render: (r) => `${r.absent_count} · ${r.late_count} · ${r.excused_count}` },
@@ -220,7 +218,6 @@ function initStudentDetail({ user, content }) {
       }
       body.innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-          ${statCard({ label: 'CGPA', value: data.cgpa === null ? '—' : Number(data.cgpa).toFixed(2), iconName: 'award', delta: 'credit-weighted average', deltaType: 'muted' })}
           ${statCard({ label: 'Credits completed', value: formatNumber(data.credits_completed, 1), iconName: 'book-open' })}
           ${statCard({ label: 'Courses completed', value: data.courses_completed, iconName: 'clipboard-list' })}
         </div>
@@ -230,7 +227,7 @@ function initStudentDetail({ user, content }) {
             <div class="bg-white rounded-xl border border-line shadow-sm overflow-hidden">
               <div class="px-5 h-12 flex items-center justify-between border-b border-line">
                 <p class="text-sm font-semibold text-ink">${escapeHtml(sem.semester_code)}</p>
-                <p class="text-xs text-muted">GPA <span class="text-sm font-semibold text-ink">${sem.gpa === null ? '—' : sem.gpa.toFixed(2)}</span> · ${formatNumber(sem.credits, 1)} credits</p>
+                <p class="text-xs text-muted">${formatNumber(sem.credits, 1)} subject credits</p>
               </div>
               ${renderTable({
                 columns: [
@@ -267,7 +264,7 @@ function initStudentDetail({ user, content }) {
             clickable: true,
             columns: [
               { key: 'invoice_no', label: 'Invoice', className: 'font-medium text-ink whitespace-nowrap' },
-              { key: 'semester_code', label: 'Semester' },
+              { key: 'semester_code', label: 'School year' },
               { key: 'total_amount', label: 'Total', className: 'tabular-nums text-right', headerClass: 'text-right', render: (r) => formatMoney(r.total_amount) },
               { key: 'paid_amount', label: 'Paid', className: 'tabular-nums text-right', headerClass: 'text-right', render: (r) => formatMoney(r.paid_amount) },
               { key: 'due_amount', label: 'Due', className: 'tabular-nums text-right font-medium', headerClass: 'text-right', render: (r) => formatMoney(r.due_amount) },

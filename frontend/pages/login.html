@@ -21,7 +21,8 @@
     <!-- Login card: 400px wide -->
     <div class="w-full max-w-[400px] bg-white rounded-xl border border-line shadow-sm p-6 sm:p-8">
       <div class="flex flex-col items-center text-center mb-6">
-        <svg viewBox="0 0 32 32" class="w-12 h-12" aria-hidden="true">
+        <img data-school-logo alt="" class="hidden w-12 h-12 rounded-xl object-cover">
+        <svg data-default-school-logo viewBox="0 0 32 32" class="w-12 h-12" aria-hidden="true">
           <rect width="32" height="32" rx="8" fill="#3f57e0"/>
           <path d="M16 7 5 12.5l11 5.5 9-4.5V20h2v-7.5L16 7Z" fill="#fff"/>
           <path d="M9.5 16.8v4.4c0 1.8 2.9 3.3 6.5 3.3s6.5-1.5 6.5-3.3v-4.4L16 20l-6.5-3.2Z" fill="#dae4ff"/>
@@ -36,7 +37,7 @@
       <form id="login-form" novalidate>
         <div class="mb-4" data-field="email">
           <label for="email" class="text-xs font-medium text-ink mb-1.5 block">Email</label>
-          <input id="email" name="email" type="email" required autocomplete="username" placeholder="you@ucms.edu"
+          <input id="email" name="email" type="email" required autocomplete="username" placeholder="staff@zpps-mamdapur.edu"
                  class="h-9 w-full rounded-lg border border-line bg-white px-3 text-sm text-ink placeholder:text-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
           <p class="text-xs text-danger mt-1 hidden" data-error></p>
         </div>

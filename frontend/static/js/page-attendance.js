@@ -33,8 +33,8 @@ async function initAttendance({ content }) {
     return;
   }
   if (!offerings.length) {
-    document.getElementById('offering-box').innerHTML = `<select disabled class="${INPUT_CLASS}"><option>No classes this semester</option></select>`;
-    document.getElementById('roster').innerHTML = card(emptyState({ iconName: 'layers', title: 'You have no classes in the active semester' }));
+    document.getElementById('offering-box').innerHTML = `<select disabled class="${INPUT_CLASS}"><option>No classes assigned</option></select>`;
+    document.getElementById('roster').innerHTML = card(emptyState({ iconName: 'layers', title: 'You have no classes assigned' }));
     refreshIcons();
     return;
   }
@@ -166,7 +166,7 @@ async function loadRoster(offeringId, classDate) {
   }
 }
 
-/** Attendance totals per student for the whole semester. */
+/** Attendance totals per student for the current school period. */
 async function openReport(offering) {
   const modal = openModal({ title: `Attendance report · ${offering.course_code}-${offering.section}`, size: 'max-w-3xl', body: skeletonTable(8, 5) });
   try {

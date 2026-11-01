@@ -425,7 +425,7 @@ def test_offering_may_be_exactly_full(conn, world):
 # ---------------------------------------------------------------------------
 def test_schema_has_all_objects(conn):
     tables = list_tables(conn)
-    assert count_core_tables(tables) == 22
+    assert count_core_tables(tables) == 23
     assert "mv_department_performance" in tables
 
     def number_of(kind: str) -> int:
@@ -433,6 +433,6 @@ def test_schema_has_all_objects(conn):
                            (kind,))
 
     assert number_of("view") == 5
-    assert number_of("trigger") == 35
+    assert number_of("trigger") == 36
     assert number_of("index") >= 26
     assert fetch_value(conn, "PRAGMA journal_mode") == "wal"

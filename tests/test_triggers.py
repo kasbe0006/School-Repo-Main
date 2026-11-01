@@ -32,7 +32,7 @@ def tables_with_updated_at(conn: sqlite3.Connection) -> list[str]:
 
 def test_every_table_with_updated_at_has_a_trigger(conn):
     tables = tables_with_updated_at(conn)
-    assert len(tables) == 21        # all core tables except audit_logs
+    assert len(tables) == 22        # all core tables except audit_logs
     triggers = {row["name"] for row in fetch_all(conn, "SELECT name FROM sqlite_master WHERE type = 'trigger'")}
     assert [t for t in tables if f"trg_{t}_updated_at" not in triggers] == []
 

@@ -44,34 +44,30 @@ const NAV_SECTIONS = [
     { page: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard', roles: ALL_ROLES },
     { page: 'school-content', label: 'Notices & Activities', icon: 'newspaper', roles: ALL_ROLES },
   ] },
-  { label: 'Academic', items: [
+  { label: 'School', items: [
     { page: 'departments', label: 'Classes & Sections', icon: 'building-2', roles: ['admin'] },
-    { page: 'teachers', label: 'Teachers', icon: 'users', roles: ['admin'] },
+    { page: 'teachers', label: 'Staff', icon: 'users', roles: ['admin'] },
     { page: 'students', label: 'Students', icon: 'graduation-cap', roles: ['admin'] },
-    { page: 'courses', label: 'Subjects', icon: 'book-open', roles: ['admin', 'teacher', 'student'] },
-    { page: 'rooms', label: 'Rooms', icon: 'door-open', roles: ['admin'] },
-    { page: 'semesters', label: 'Academic Terms', icon: 'calendar-range', roles: ['admin'] },
+    { page: 'courses', label: 'Subjects', icon: 'book-open', roles: ['admin', 'teacher'] },
   ] },
   { label: 'Teaching', items: [
-    { page: 'offerings', label: 'Class Subjects', icon: 'layers', roles: ['admin', 'teacher'] },
     { page: 'routine', label: 'Weekly Routine', icon: 'calendar-clock', roles: ['admin', 'teacher', 'student'] },
     { page: 'attendance', label: 'Attendance', icon: 'calendar-check', roles: ['admin', 'teacher'] },
-    { page: 'gradebook', label: 'Gradebook', icon: 'table', roles: ['admin', 'teacher'] },
-  ] },
-  { label: 'My Studies', items: [
-    { page: 'student-detail', label: 'My Record', icon: 'user-round', roles: ['student'] },
+    { page: 'gradebook', label: 'Results', icon: 'table', roles: ['admin', 'teacher'] },
   ] },
   { label: 'Finance', items: [
     { page: 'billing', label: 'Billing', icon: 'wallet', roles: ['admin', 'accountant'] },
   ] },
   { label: 'Insights', items: [
-    { page: 'reports', label: 'Reports', icon: 'chart-column', roles: ['admin', 'teacher', 'accountant'] },
     { page: 'audit-log', label: 'Audit Log', icon: 'shield-check', roles: ['admin'] },
+  ] },
+  { label: 'Administration', items: [
+    { page: 'settings', label: 'School Settings', icon: 'settings', roles: ['admin'] },
   ] },
 ];
 
 // page -> allowed roles. student-detail is also opened by admins from the students table.
-const PAGE_ROLES = { 'student-detail': ['admin', 'student'] };
+const PAGE_ROLES = { 'student-detail': ['admin'] };
 for (const section of NAV_SECTIONS) {
   for (const item of section.items) {
     if (!PAGE_ROLES[item.page]) PAGE_ROLES[item.page] = item.roles;
@@ -103,6 +99,7 @@ let branding = {
   school_name: 'Zilla Parishad Primary School, Mamdapur',
   school_short_name: 'ZPPS Mamdapur',
   school_tagline: 'School management for ZPPS Mamdapur',
+  logo_url: null,
 };
 
 function loadBranding() {
@@ -112,6 +109,13 @@ function loadBranding() {
     document.querySelectorAll('[data-school-name]').forEach((el) => { el.textContent = branding.school_name; });
     document.querySelectorAll('[data-school-short-name]').forEach((el) => { el.textContent = branding.school_short_name; });
     document.querySelectorAll('[data-school-tagline]').forEach((el) => { el.textContent = branding.school_tagline; });
+    document.querySelectorAll('[data-school-logo]').forEach((el) => {
+      if (branding.logo_url) {
+        el.src = branding.logo_url;
+        el.classList.remove('hidden');
+        document.querySelectorAll('[data-default-school-logo]').forEach((logo) => logo.classList.add('hidden'));
+      }
+    });
     return branding;
   }).catch(() => branding);
 }
@@ -268,7 +272,9 @@ function renderLayout(activePage, title, user) {
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-line flex flex-col
                                -translate-x-full lg:translate-x-0 transition-transform duration-200">
       <div class="h-16 shrink-0 flex items-center gap-2.5 px-5 border-b border-line">
-        ${LOGO_SVG}
+        ${branding.logo_url
+          ? `<img data-school-logo src="${escapeHtml(branding.logo_url)}" alt="" class="w-8 h-8 rounded-lg object-cover">`
+          : LOGO_SVG}
         <span data-school-short-name class="text-lg font-semibold tracking-tight text-primary-600">${escapeHtml(branding.school_short_name)}</span>
         <button id="drawer-close" class="${btnClass('ghost', 'icon-sm')} ml-auto lg:hidden" aria-label="Close menu">${icon('x', 18)}</button>
       </div>
@@ -284,9 +290,6 @@ function renderLayout(activePage, title, user) {
         <button id="drawer-open" class="${btnClass('ghost', 'icon')} lg:hidden -ml-2" aria-label="Open menu">${icon('menu', 20)}</button>
         <h1 class="text-base sm:text-lg font-semibold tracking-tight text-ink truncate">${escapeHtml(title)}</h1>
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
-          <span id="semester-pill" class="hidden md:inline-flex items-center gap-1.5 h-7 px-3 rounded-full bg-primary-50 text-primary-700 text-xs font-medium">
-            ${icon('calendar-range', 14)}<span>…</span>
-          </span>
           <span class="hidden sm:inline-flex">${badge('info', titleCase(user.role))}</span>
           <div class="w-8 h-8 rounded-full bg-primary-600 text-white text-xs font-semibold flex items-center justify-center" title="${escapeHtml(user.full_name)}">
             ${escapeHtml(initials(user.full_name))}
@@ -311,12 +314,6 @@ function renderLayout(activePage, title, user) {
   overlay.addEventListener('click', () => setDrawer(false));
   document.getElementById('change-password-btn').addEventListener('click', openChangePasswordModal);
   document.getElementById('logout-btn').addEventListener('click', logout);
-
-  // Active semester pill (fills in when the request returns)
-  loadActiveSemester().then((semester) => {
-    const pill = document.querySelector('#semester-pill span');
-    if (pill) pill.textContent = semester ? `${semester.code} · Active term` : 'No active term';
-  });
 
   refreshIcons();
   loadBranding();

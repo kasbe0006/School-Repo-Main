@@ -41,6 +41,33 @@ def migrate_school_schema(conn: sqlite3.Connection) -> None:
             )"""
         )
         conn.execute(
+            """CREATE TABLE IF NOT EXISTS school_settings (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                school_name TEXT NOT NULL,
+                school_short_name TEXT NOT NULL,
+                school_tagline TEXT NOT NULL,
+                school_address TEXT NOT NULL DEFAULT '',
+                school_phone TEXT NOT NULL DEFAULT '',
+                school_email TEXT NOT NULL DEFAULT '',
+                logo_url TEXT NULL,
+                updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )"""
+        )
+        conn.execute(
+            """INSERT OR IGNORE INTO school_settings
+               (id, school_name, school_short_name, school_tagline)
+               VALUES (1, 'Zilla Parishad Primary School, Mamdapur',
+                       'ZPPS Mamdapur', 'School management for ZPPS Mamdapur')"""
+        )
+        conn.execute(
+            """CREATE TRIGGER IF NOT EXISTS trg_school_settings_updated_at
+               AFTER UPDATE ON school_settings
+               FOR EACH ROW WHEN NEW.updated_at = OLD.updated_at
+               BEGIN
+                   UPDATE school_settings SET updated_at = datetime('now') WHERE id = NEW.id;
+               END"""
+        )
+        conn.execute(
             """CREATE TRIGGER IF NOT EXISTS trg_school_content_updated_at
                AFTER UPDATE ON school_content
                FOR EACH ROW WHEN NEW.updated_at = OLD.updated_at

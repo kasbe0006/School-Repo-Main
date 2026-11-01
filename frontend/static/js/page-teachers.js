@@ -1,6 +1,6 @@
 /*
  * page-teachers.js: teacher table with filters, create/edit modal, and a
- * detail drawer showing the workload (from the v_teacher_workload view).
+ * detail drawer showing the teaching workload.
  */
 
 const DESIGNATIONS = [
@@ -12,7 +12,7 @@ const DESIGNATIONS = [
 const TEACHER_STATUSES = ['active', 'on_leave', 'resigned'];
 
 async function initTeachers({ content }) {
-  content.innerHTML = pageHeader('Teachers', 'Teachers, their school groups and class workload.') + `<div id="list">${card(skeletonTable(8, 6), 'p-0')}</div>`;
+  content.innerHTML = pageHeader('Staff', 'Manage teachers and school staff accounts, roles and contact details.') + `<div id="list">${card(skeletonTable(8, 6), 'p-0')}</div>`;
 
   let departments = [];
   try {
@@ -32,7 +32,7 @@ async function initTeachers({ content }) {
       { name: 'department_id', label: 'School group', options: departmentOptions },
       { name: 'status', label: 'Status', options: TEACHER_STATUSES.map((s) => ({ value: s, label: titleCase(s) })) },
     ],
-    toolbarHtml: `<button type="button" id="new-teacher" class="${btnClass('primary')}">${icon('plus', 16)} New teacher</button>`,
+    toolbarHtml: `<button type="button" id="new-teacher" class="${btnClass('primary')}">${icon('plus', 16)} Add staff member</button>`,
     emptyIcon: 'users',
     columns: [
       { key: 'employee_code', label: 'Code', sortable: true, render: (r) => `<span class="font-medium text-ink">${escapeHtml(r.employee_code)}</span>` },
@@ -70,8 +70,8 @@ async function initTeachers({ content }) {
       ${isEdit ? field({ name: 'is_active', label: 'Login account enabled', type: 'checkbox', value: teacher.is_active }) : ''}`;
 
     formModal({
-      title: isEdit ? `Edit ${teacher.full_name}` : 'New teacher',
-      submitText: isEdit ? 'Save changes' : 'Create teacher',
+      title: isEdit ? `Edit ${teacher.full_name}` : 'Add staff member',
+      submitText: isEdit ? 'Save changes' : 'Create staff account',
       size: 'max-w-2xl',
       fieldsHtml,
       onSubmit: async (values) => {
@@ -95,7 +95,7 @@ async function initTeachers({ content }) {
   }
 }
 
-/** Slide-over with the teacher's profile and workload per semester. */
+/** Slide-over with the staff member's profile and teaching workload. */
 async function openTeacherDrawer(teacher) {
   const drawer = openDrawer({ title: teacher.full_name, body: `<div class="space-y-4">${skeletonBlock('h-24 w-full')}${skeletonTable(4, 4)}</div>` });
   try {
@@ -113,12 +113,12 @@ async function openTeacherDrawer(teacher) {
               <span class="text-xs text-muted tabular-nums whitespace-nowrap">${o.enrolled_count}/${o.capacity} · ${o.credits} cr</span>
             </div>
           </div>`).join('')
-      : emptyState({ iconName: 'layers', title: 'No offerings this semester' });
+      : emptyState({ iconName: 'layers', title: 'No classes assigned' });
 
     const history = data.per_semester.length
       ? renderTable({
         columns: [
-          { key: 'semester_code', label: 'Semester' },
+          { key: 'semester_code', label: 'School year' },
           { key: 'course_count', label: 'Courses', className: 'tabular-nums' },
           { key: 'total_credits', label: 'Subject load', className: 'tabular-nums' },
           { key: 'total_students', label: 'Students', className: 'tabular-nums' },
@@ -140,9 +140,9 @@ async function openTeacherDrawer(teacher) {
         ['Login', t.is_active ? badge('active', 'Enabled') : badge('inactive', 'Disabled')],
         ['Last login', formatDateTime(t.last_login_at)],
       ]))}
-      <div class="mt-4">${card(cardTitle('This semester') + current)}</div>
+      <div class="mt-4">${card(cardTitle('Current classes') + current)}</div>
       <div class="mt-4 bg-white rounded-xl border border-line shadow-sm overflow-hidden">
-        <div class="px-5 pt-5">${cardTitle('Workload per semester', '<span class="text-xs text-muted">from v_teacher_workload</span>')}</div>
+        <div class="px-5 pt-5">${cardTitle('Teaching history', '<span class="text-xs text-muted">from school records</span>')}</div>
         ${history}
       </div>`;
     refreshIcons();
@@ -155,5 +155,5 @@ async function openTeacherDrawer(teacher) {
 // Start the page. This is at the BOTTOM on purpose: every constant and function
 // above exists by now (a `const` used before its line throws a ReferenceError).
 // ---------------------------------------------------------------------------
-const session = startPage('teachers', 'Teachers');
+const session = startPage('teachers', 'Staff');
 if (session) initTeachers(session);

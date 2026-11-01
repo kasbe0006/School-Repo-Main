@@ -39,6 +39,12 @@ async function loadPublicContent() {
     document.title = config.school_short_name;
     document.querySelectorAll('[data-school-name]').forEach((el) => { el.textContent = config.school_name; });
     document.querySelectorAll('[data-school-tagline]').forEach((el) => { el.textContent = config.school_tagline; });
+    document.querySelectorAll('[data-school-logo]').forEach((el) => {
+      if (config.logo_url) {
+        el.src = config.logo_url;
+        el.classList.remove('hidden');
+      }
+    });
     mount.innerHTML = content.items.length
       ? content.items.map(publicCard).join('')
       : '<div class="md:col-span-2 bg-white rounded-xl border border-line p-10 text-center text-muted">School information will be published here soon.</div>';

@@ -7,7 +7,7 @@
 function initDashboard({ user, content }) {
   const firstName = (user.full_name || '').split(' ')[0];
   content.innerHTML = `
-    ${pageHeader(`Welcome back, ${firstName}`, 'Here is what is happening this semester.')}
+    ${pageHeader(`Welcome back, ${firstName}`, 'Here is what is happening at your school.')}
     <div id="stats" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">${skeletonCards(4)}</div>
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
       <div class="xl:col-span-2 bg-white rounded-xl border border-line shadow-sm p-5">
@@ -37,7 +37,6 @@ function formatCardValue(cardData) {
   switch (cardData.format) {
     case 'money': return formatMoney(value);
     case 'percent': return formatPercent(value);
-    case 'gpa': return Number(value).toFixed(2);
     default: return formatNumber(value);
   }
 }

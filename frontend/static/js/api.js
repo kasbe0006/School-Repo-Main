@@ -75,4 +75,5 @@ const api = {
   patch: (path, body, options) => apiRequest('PATCH', path, body ?? {}, options),
   del: (path, options) => apiRequest('DELETE', path, undefined, options),
   upload: (path, formData, options) => apiRequest('POST', path, formData, options),
+  uploadPatch: (path, formData, options) => apiRequest('PATCH', path, formData, options),
 };

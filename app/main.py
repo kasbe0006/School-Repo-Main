@@ -19,7 +19,7 @@ from app.database import enable_wal, fetch_value, get_connection
 from app.errors import register_exception_handlers
 from app.routers import (announcements, assessments, attendance, audit_logs, auth, billing, courses,
                          dashboard, departments, enrollments, offerings, reports, rooms, schedules,
-                         semesters, students, teachers, school_content)
+                         semesters, students, teachers, school_content, school_settings)
 
 
 @asynccontextmanager
@@ -79,19 +79,20 @@ app.add_middleware(SecurityHeadersMiddleware)
 # Every router lives under /api
 for module in (auth, dashboard, departments, teachers, students, courses, rooms, semesters, offerings,
                schedules, enrollments, attendance, assessments, billing, announcements, school_content,
-               audit_logs, reports):
+               school_settings, audit_logs, reports):
     app.include_router(module.router, prefix="/api")
 
 # The frontend: plain files. Mounted LAST, so /api/... routes win.
 # html=True serves index.html for "/".
 @app.get("/api/config", include_in_schema=False)
-def public_config() -> dict[str, str]:
+def public_config() -> dict[str, str | None]:
     """Return non-sensitive branding settings used by the frontend."""
-    return {
-        "school_name": config.SCHOOL_NAME,
-        "school_short_name": config.SCHOOL_SHORT_NAME,
-        "school_tagline": config.SCHOOL_TAGLINE,
-    }
+    from app.repositories.school_settings import get_settings
+    conn = get_connection()
+    try:
+        return get_settings(conn)
+    finally:
+        conn.close()
 
 
 @app.get("/health", include_in_schema=False, response_model=None)

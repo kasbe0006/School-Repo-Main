@@ -33,8 +33,8 @@ async function initGradebook({ content }) {
     return;
   }
   if (!offerings.length) {
-    document.getElementById('offering-box').innerHTML = `<select disabled class="${INPUT_CLASS}"><option>No classes this semester</option></select>`;
-    document.getElementById('grid').innerHTML = card(emptyState({ iconName: 'table', title: 'You have no classes in the active semester' }));
+    document.getElementById('offering-box').innerHTML = `<select disabled class="${INPUT_CLASS}"><option>No classes assigned</option></select>`;
+    document.getElementById('grid').innerHTML = card(emptyState({ iconName: 'table', title: 'You have no classes assigned' }));
     refreshIcons();
     return;
   }

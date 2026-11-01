@@ -10,7 +10,6 @@ if (getToken() && getUser()) {
 const DEMO_ACCOUNTS = [
   { email: 'admin@ucms.edu', role: 'Admin', iconName: 'shield-check' },
   { email: 'teacher@ucms.edu', role: 'Teacher', iconName: 'users' },
-  { email: 'student@ucms.edu', role: 'Student', iconName: 'graduation-cap' },
   { email: 'accountant@ucms.edu', role: 'Accountant', iconName: 'wallet' },
 ];
 

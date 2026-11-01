@@ -44,10 +44,11 @@ It has role-based portals and a database layer that enforces its own business ru
 
 ## Overview
 
-School ERP is customized for ZPPS Mamdapur: administrators manage classes, sections, students,
-teachers and subjects; teachers take attendance and publish grades; accountants manage fees; and
-school staff can publish notices, activities, photos, videos, admission requirements and
-scholarship information.
+School ERP is built only for ZPPS Mamdapur: administrators manage classes, sections, students,
+staff and subjects; teachers take attendance and publish results; accountants manage school fees;
+and school staff can publish notices, activities, photos, videos, admission requirements and
+scholarship information. An administrator can also update the school's name, logo, tagline and
+contact details from School Settings.
 
 The core design choice is that **data integrity lives in the database, not only in the
 application code.** Over-full classes, double-booked rooms, marks above the maximum, over-paid
@@ -62,23 +63,25 @@ audit trail by the database. The rules still hold for writes that bypass the API
 | Frontend | HTML, vanilla JavaScript, Tailwind CSS, Chart.js, Lucide icons. No build step. |
 | Quality | Automated pytest coverage, including multi-threaded race-condition and authentication protection tests |
 
-**At a glance:** 22 normalized tables · 35 triggers · 5 views · 26 indexes · 70 REST endpoints ·
-19 responsive pages · 4 user roles · about 89,000 rows of realistic demo data.
+**At a glance:** 23 normalized tables · 36 triggers · 5 views · 26 indexes · 72 REST endpoints ·
+14 responsive school pages · staff-focused role-based access.
 
 ---
 
 ## Key features
 
 ### For each role
-- **Admin:** manage classes and sections, teachers, students (a 2-step onboarding form), subjects,
-  rooms and academic terms; filter students by class and section; schedule class subjects with
-  automatic clash detection; publish school content and browse the full audit trail.
+- **Admin:** manage classes and sections, staff, students (a 2-step onboarding form), subjects,
+  attendance, results, school fees and weekly routine; publish school content and update the
+  school's logo, name, tagline and contact details from School Settings.
 - **Teacher:** weekly timetable, bulk attendance entry, a gradebook with live weighted totals,
-  one-click grade finalization, and class analytics (grade distribution, low-attendance alerts).
-- **Student:** view their subjects, timetable, attendance summary, progress report and outstanding dues.
-- **Accountant:** fee structures with department-level overrides, invoice generation for a single
-  student or a whole semester, payment recording (cash, bank, bKash, Nagad, card) and collection
-  reports.
+  one-click result finalization, and class attendance management.
+- **Accountant:** school fee structures, invoice generation, payment recording (cash, bank,
+  bKash, Nagad, card) and collection records.
+
+The visible website intentionally does not expose college-only modules such as semesters,
+enrollment, CGPA, GPA, course prerequisites, rooms or academic reports. Legacy database and API
+names remain only where needed to preserve existing records and calculations.
 
 Every signed-in user can change their password from the key icon in the top navigation.
 

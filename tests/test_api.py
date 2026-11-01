@@ -98,6 +98,8 @@ ENDPOINTS = [
     ("GET", "/api/school-content", ALL),
     ("POST", "/api/school-content", {"admin"}),
     ("DELETE", "/api/school-content/9999", {"admin"}),
+    ("GET", "/api/settings", {"admin"}),
+    ("PATCH", "/api/settings", {"admin"}),
     ("GET", "/api/audit-logs", {"admin"}),
     ("GET", "/api/reports/grade-distribution", STAFF),
     ("GET", "/api/reports/department-performance", {"admin"}),

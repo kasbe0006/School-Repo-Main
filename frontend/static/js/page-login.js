@@ -11,6 +11,9 @@ const form = document.getElementById('login-form');
 const errorBox = document.getElementById('login-error');
 const button = document.getElementById('login-button');
 
+// Remove this legacy block if an older cached login.html is served.
+document.getElementById('demo-accounts')?.closest('div.w-full')?.remove();
+
 loadBranding();
 
 /** Show a message in the red error area above the form. */

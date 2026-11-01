@@ -14,3 +14,8 @@
   to = "https://kinds-andale-beans-appropriate.trycloudflare.com/media/:splat"
   status = 200
   force = true
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"

@@ -9,7 +9,7 @@ def _columns(conn: sqlite3.Connection, table: str) -> set[str]:
 
 
 def migrate_school_schema(conn: sqlite3.Connection) -> None:
-    """Add grade/section and guardian email fields when they are missing."""
+    """Add school-specific fields and content tables when they are missing."""
     student_columns = _columns(conn, "students")
     profile_columns = _columns(conn, "student_profiles")
     conn.execute("BEGIN IMMEDIATE")
@@ -20,6 +20,34 @@ def migrate_school_schema(conn: sqlite3.Connection) -> None:
             conn.execute("ALTER TABLE students ADD COLUMN section TEXT NOT NULL DEFAULT 'A'")
         if "guardian_email" not in profile_columns:
             conn.execute("ALTER TABLE student_profiles ADD COLUMN guardian_email TEXT")
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS school_content (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                kind TEXT NOT NULL CHECK (kind IN ('notice','activity','gallery','admission')),
+                title TEXT NOT NULL CHECK (length(trim(title)) BETWEEN 3 AND 200),
+                description TEXT NOT NULL CHECK (length(trim(description)) BETWEEN 3 AND 10000),
+                event_date TEXT NULL,
+                event_end_date TEXT NULL,
+                location TEXT NULL,
+                image_url TEXT NULL,
+                video_url TEXT NULL,
+                documents_required TEXT NULL,
+                scholarship_info TEXT NULL,
+                is_published INTEGER NOT NULL DEFAULT 1 CHECK (is_published IN (0,1)),
+                created_by INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+                CHECK (event_end_date IS NULL OR event_date IS NULL OR event_end_date >= event_date)
+            )"""
+        )
+        conn.execute(
+            """CREATE TRIGGER IF NOT EXISTS trg_school_content_updated_at
+               AFTER UPDATE ON school_content
+               FOR EACH ROW WHEN NEW.updated_at = OLD.updated_at
+               BEGIN
+                   UPDATE school_content SET updated_at = datetime('now') WHERE id = NEW.id;
+               END"""
+        )
         conn.execute("COMMIT")
     except BaseException:
         if conn.in_transaction:

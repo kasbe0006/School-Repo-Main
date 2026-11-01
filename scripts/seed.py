@@ -787,7 +787,7 @@ def seed_semester(conn, semester: dict, courses: list[dict], prereqs: dict, stud
                     status_today = "late" if rng.random() < 0.08 else "present"
                 elif rng.random() < 0.15:
                     status_today, remarks = "excused", rng.choice(["Medical leave", "Family emergency",
-                                                                   "University sports event"])
+                                                                   "School sports event"])
                 else:
                     status_today = "absent"
                 attendance_rows.append((enrollment_id, class_day.isoformat(), status_today, remarks, teacher_user))

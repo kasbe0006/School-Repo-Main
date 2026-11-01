@@ -1,11 +1,10 @@
 /*
- * page-semesters.js: semesters as cards. "Set active" (with confirmation) and
- * "Close semester" (finalizes every grade, then switches the active semester).
+ * page-semesters.js: academic terms as cards.
  */
 
 function initSemesters({ content }) {
   content.innerHTML = `
-    ${pageHeader('Semesters', 'Only one semester can be active at a time (enforced by a partial unique index).',
+    ${pageHeader('Academic Terms', 'Only one academic term can be active at a time.',
       `<button type="button" id="new-semester" class="${btnClass('primary')}">${icon('plus', 16)} New semester</button>`)}
     <div id="cards" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">${skeletonCards(3)}</div>`;
   refreshIcons();
@@ -19,7 +18,7 @@ async function loadSemesterCards() {
   try {
     const data = await api.get('/semesters', { limit: 100 }, { silent: true });
     if (!data.items.length) {
-      box.innerHTML = `<div class="md:col-span-2 xl:col-span-3">${card(emptyState({ iconName: 'calendar-range', title: 'No semesters yet' }))}</div>`;
+      box.innerHTML = `<div class="md:col-span-2 xl:col-span-3">${card(emptyState({ iconName: 'calendar-range', title: 'No academic terms yet' }))}</div>`;
       refreshIcons();
       return;
     }
@@ -66,8 +65,8 @@ function semesterCard(s) {
 
 async function activate(semester) {
   const ok = await confirmDialog({
-    title: `Make ${semester.code} the active semester?`,
-    message: 'The current active semester will be switched off. Registration, routines and dashboards will use this semester instead.',
+    title: `Make ${semester.code} the active academic term?`,
+    message: 'The current active term will be switched off. Registration, routines and dashboards will use this term instead.',
     confirmText: 'Set active',
     danger: false,
   });

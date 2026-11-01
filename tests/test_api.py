@@ -95,6 +95,9 @@ ENDPOINTS = [
     ("GET", "/api/payments", MONEY),
     ("GET", "/api/announcements", ALL),
     ("POST", "/api/announcements", {"admin"}),
+    ("GET", "/api/school-content", ALL),
+    ("POST", "/api/school-content", {"admin"}),
+    ("DELETE", "/api/school-content/9999", {"admin"}),
     ("GET", "/api/audit-logs", {"admin"}),
     ("GET", "/api/reports/grade-distribution", STAFF),
     ("GET", "/api/reports/department-performance", {"admin"}),
@@ -141,6 +144,7 @@ def test_every_api_route_is_in_the_matrix():
     not_needed = {
         ("POST", "/api/auth/login"),        # public on purpose
         ("GET", "/api/config"),             # public branding settings
+        ("GET", "/api/school-content/public"),  # public school information
         ("GET", "/api/invoices/{}"),        # any role may call it; test_student_cannot_open_another_students_invoice
     }
     assert sorted(routes - in_matrix - not_needed) == []

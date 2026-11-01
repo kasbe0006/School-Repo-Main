@@ -33,11 +33,13 @@ def list_students(
     list_args: dict = Depends(list_params),
     department_id: int | None = Query(None),
     status: str | None = Query(None),
+    grade_level: int | None = Query(None, ge=1, le=12),
+    section: str | None = Query(None, min_length=1, max_length=10),
     user: dict = Depends(require_role("admin")),
     conn: sqlite3.Connection = Depends(get_db),
 ) -> dict:
     """Paged list of students with CGPA, filterable by department and status."""
-    return repo.list_students(conn, list_args, department_id, status)
+    return repo.list_students(conn, list_args, department_id, status, grade_level, section)
 
 
 @router.post("", status_code=201)

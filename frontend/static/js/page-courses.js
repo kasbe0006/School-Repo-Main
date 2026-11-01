@@ -1,11 +1,10 @@
 /*
- * page-courses.js: course catalogue. Admins can create/edit courses and
- * manage prerequisites (a multi-select). Everyone can open the prerequisite tree.
+ * page-courses.js: subject catalogue for the school.
  */
 
 async function initCourses({ user, content }) {
   const isAdmin = user.role === 'admin';
-  content.innerHTML = pageHeader('Courses', 'The course catalogue with credits, levels and prerequisites.') + `<div id="list">${card(skeletonTable(8, 6), 'p-0')}</div>`;
+  content.innerHTML = pageHeader('Subjects', 'Manage the subjects taught across school classes.') + `<div id="list">${card(skeletonTable(8, 6), 'p-0')}</div>`;
 
   let departments = [];
   try {
@@ -22,28 +21,22 @@ async function initCourses({ user, content }) {
     searchPlaceholder: 'Search code or title…',
     defaultSort: 'code',
     filters: [
-      { name: 'department_id', label: 'Department', options: departmentOptions },
-      { name: 'level', label: 'Level', options: [1, 2, 3, 4].map((l) => ({ value: l, label: `Level ${l}` })) },
+      { name: 'department_id', label: 'School group', options: departmentOptions },
+      { name: 'level', label: 'Class range', options: [1, 2, 3, 4].map((l) => ({ value: l, label: `Classes ${l * 3 - 2}–${l * 3}` })) },
     ],
-    toolbarHtml: isAdmin ? `<button type="button" id="new-course" class="${btnClass('primary')}">${icon('plus', 16)} New course</button>` : '',
+    toolbarHtml: isAdmin ? `<button type="button" id="new-course" class="${btnClass('primary')}">${icon('plus', 16)} New subject</button>` : '',
     emptyIcon: 'book-open',
     columns: [
       { key: 'code', label: 'Code', sortable: true, render: (r) => `<span class="font-medium text-ink">${escapeHtml(r.code)}</span>` },
       { key: 'title', label: 'Title', sortable: true, render: (r) => `<p class="text-ink min-w-[180px]">${escapeHtml(r.title)}</p>` },
-      { key: 'department_code', label: 'Dept', sortable: true },
-      { key: 'level', label: 'Level', sortable: true, className: 'tabular-nums' },
-      { key: 'credits', label: 'Credits', sortable: true, className: 'tabular-nums' },
-      { key: 'prerequisite_codes', label: 'Prerequisites', render: (r) => (r.prerequisite_codes
-        ? r.prerequisite_codes.split(', ').map((code) => `<span class="inline-block mr-1 mb-1">${badge('completed', code)}</span>`).join('')
-        : '<span class="text-muted text-xs">None</span>') },
+      { key: 'department_code', label: 'School group', sortable: true },
+      { key: 'level', label: 'Class range', sortable: true, className: 'tabular-nums', render: (r) => `Classes ${r.level * 3 - 2}–${r.level * 3}` },
+      { key: 'credits', label: 'Periods/week', sortable: true, className: 'tabular-nums' },
       { key: 'is_active', label: 'Status', render: (r) => badge(r.is_active ? 'active' : 'inactive') },
-      { key: 'actions', label: '', className: 'text-right whitespace-nowrap', render: () =>
-        rowAction('tree', 'git-fork', 'Prerequisite tree') + (isAdmin ? rowAction('prereqs', 'network', 'Manage prerequisites') + rowAction('edit', 'pencil', 'Edit') : '') },
+      { key: 'actions', label: '', className: 'text-right whitespace-nowrap', render: () => (isAdmin ? rowAction('edit', 'pencil', 'Edit') : '') },
     ],
     onRowClick: (row) => (isAdmin ? openCourseForm(row) : goToTree(row)),
     onAction: (action, row) => {
-      if (action === 'tree') goToTree(row);
-      if (action === 'prereqs') openPrerequisiteManager(row, list);
       if (action === 'edit') openCourseForm(row);
     },
   });
@@ -57,23 +50,23 @@ async function initCourses({ user, content }) {
   function openCourseForm(course) {
     const isEdit = Boolean(course);
     formModal({
-      title: isEdit ? `Edit ${course.code}` : 'New course',
-      submitText: isEdit ? 'Save changes' : 'Create course',
+      title: isEdit ? `Edit ${course.code}` : 'New subject',
+        submitText: isEdit ? 'Save changes' : 'Create subject',
       fieldsHtml: `
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
           ${field({ name: 'code', label: 'Code', required: true, pattern: '[A-Z]{2,6}[0-9]{3}', title: 'Letters then 3 digits, e.g. CSE404', value: course?.code, placeholder: 'CSE404' })}
-          ${field({ name: 'department_id', label: 'Department', type: 'select', number: true, required: true, value: course?.department_id, options: departmentOptions })}
+          ${field({ name: 'department_id', label: 'School group', type: 'select', number: true, required: true, value: course?.department_id, options: departmentOptions })}
         </div>
         ${field({ name: 'title', label: 'Title', required: true, minlength: 2, maxlength: 120, value: course?.title })}
         ${field({ name: 'description', label: 'Description', type: 'textarea', maxlength: 1000, value: course?.description })}
         <div class="grid grid-cols-2 gap-x-4">
-          ${field({ name: 'credits', label: 'Credits', type: 'number', required: true, min: 0.5, max: 6, step: 0.5, value: course?.credits ?? 3 })}
-          ${field({ name: 'level', label: 'Level', type: 'select', number: true, required: true, noEmpty: true, value: course?.level ?? 1, options: [1, 2, 3, 4].map((l) => ({ value: l, label: `Level ${l}` })) })}
+          ${field({ name: 'credits', label: 'Periods per week', type: 'number', required: true, min: 0.5, max: 6, step: 0.5, value: course?.credits ?? 3 })}
+          ${field({ name: 'level', label: 'Class range', type: 'select', number: true, required: true, noEmpty: true, value: course?.level ?? 1, options: [1, 2, 3, 4].map((l) => ({ value: l, label: `Classes ${l * 3 - 2}–${l * 3}` })) })}
         </div>
-        ${isEdit ? field({ name: 'is_active', label: 'Course is active (can be offered)', type: 'checkbox', value: course.is_active }) : ''}`,
+        ${isEdit ? field({ name: 'is_active', label: 'Subject is active (can be scheduled)', type: 'checkbox', value: course.is_active }) : ''}`,
       onSubmit: async (values) => {
         if (isEdit && course.is_active && !values.is_active) {
-          const ok = await confirmDialog({ title: 'Deactivate course?', message: `${course.code} can no longer be offered in new semesters.`, confirmText: 'Deactivate' });
+          const ok = await confirmDialog({ title: 'Deactivate subject?', message: `${course.code} can no longer be scheduled in new academic terms.`, confirmText: 'Deactivate' });
           if (!ok) throw new Error('cancelled');
         }
         return isEdit ? api.patch(`/courses/${course.id}`, values) : api.post('/courses', values);

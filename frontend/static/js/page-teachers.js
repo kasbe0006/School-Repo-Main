@@ -3,11 +3,16 @@
  * detail drawer showing the workload (from the v_teacher_workload view).
  */
 
-const DESIGNATIONS = ['lecturer', 'assistant_professor', 'associate_professor', 'professor'];
+const DESIGNATIONS = [
+  { value: 'lecturer', label: 'Assistant Teacher' },
+  { value: 'assistant_professor', label: 'Teacher' },
+  { value: 'associate_professor', label: 'Senior Teacher' },
+  { value: 'professor', label: 'Head Teacher' },
+];
 const TEACHER_STATUSES = ['active', 'on_leave', 'resigned'];
 
 async function initTeachers({ content }) {
-  content.innerHTML = pageHeader('Teachers', 'Faculty members, their departments and workload.') + `<div id="list">${card(skeletonTable(8, 6), 'p-0')}</div>`;
+  content.innerHTML = pageHeader('Teachers', 'Teachers, their school groups and class workload.') + `<div id="list">${card(skeletonTable(8, 6), 'p-0')}</div>`;
 
   let departments = [];
   try {
@@ -24,7 +29,7 @@ async function initTeachers({ content }) {
     searchPlaceholder: 'Search name, code or email…',
     defaultSort: 'full_name',
     filters: [
-      { name: 'department_id', label: 'Department', options: departmentOptions },
+      { name: 'department_id', label: 'School group', options: departmentOptions },
       { name: 'status', label: 'Status', options: TEACHER_STATUSES.map((s) => ({ value: s, label: titleCase(s) })) },
     ],
     toolbarHtml: `<button type="button" id="new-teacher" class="${btnClass('primary')}">${icon('plus', 16)} New teacher</button>`,
@@ -34,7 +39,7 @@ async function initTeachers({ content }) {
       { key: 'full_name', label: 'Name', sortable: true, render: (r) => `
           <div class="min-w-[160px]"><p class="font-medium text-ink">${escapeHtml(r.full_name)} ${r.is_head ? badge('info', 'Head') : ''}</p>
           <p class="text-xs text-muted">${escapeHtml(r.email)}</p></div>` },
-      { key: 'department_code', label: 'Dept', sortable: true },
+      { key: 'department_code', label: 'School group', sortable: true },
       { key: 'designation', label: 'Designation', sortable: true, render: (r) => escapeHtml(titleCase(r.designation)) },
       { key: 'hired_at', label: 'Hired', sortable: true, render: (r) => formatDate(r.hired_at), className: 'whitespace-nowrap' },
       { key: 'status', label: 'Status', sortable: true, render: (r) => badge(r.status) },
@@ -56,8 +61,8 @@ async function initTeachers({ content }) {
         ${field({ name: 'first_name', label: 'First name', required: true, maxlength: 80, value: teacher?.first_name })}
         ${field({ name: 'last_name', label: 'Last name', required: true, maxlength: 80, value: teacher?.last_name })}
         ${isEdit ? '' : field({ name: 'employee_code', label: 'Employee code', required: true, pattern: '[A-Z0-9\\-]{3,20}', title: '3–20 capital letters, digits or dashes', placeholder: 'EMP031' })}
-        ${field({ name: 'department_id', label: 'Department', type: 'select', number: true, required: true, value: teacher?.department_id, options: departmentOptions })}
-        ${field({ name: 'designation', label: 'Designation', type: 'select', required: true, value: teacher?.designation, options: DESIGNATIONS.map((d) => ({ value: d, label: titleCase(d) })) })}
+        ${field({ name: 'department_id', label: 'School group', type: 'select', number: true, required: true, value: teacher?.department_id, options: departmentOptions })}
+        ${field({ name: 'designation', label: 'School role', type: 'select', required: true, value: teacher?.designation, options: DESIGNATIONS })}
         ${field({ name: 'hired_at', label: 'Hired on', type: 'date', required: true, value: teacher?.hired_at, max: todayISO() })}
         ${field({ name: 'phone', label: 'Phone', type: 'tel', pattern: '\\+?[0-9]{7,15}', title: '7–15 digits, e.g. 01712345678', value: teacher?.phone, placeholder: '01712345678' })}
         ${field({ name: 'status', label: 'Status', type: 'select', noEmpty: true, value: teacher?.status || 'active', options: TEACHER_STATUSES.map((s) => ({ value: s, label: titleCase(s) })) })}

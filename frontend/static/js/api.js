@@ -34,7 +34,8 @@ function toQueryString(params) {
 
 async function apiRequest(method, path, body, options = {}) {
   const headers = { Accept: 'application/json' };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  if (body !== undefined && !isFormData) headers['Content-Type'] = 'application/json';
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
@@ -43,7 +44,7 @@ async function apiRequest(method, path, body, options = {}) {
     response = await fetch(API_BASE + path, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: body !== undefined ? (isFormData ? body : JSON.stringify(body)) : undefined,
     });
   } catch (networkError) {
     const error = new ApiError('Cannot reach the server. Is it running?', 0);
@@ -73,4 +74,5 @@ const api = {
   post: (path, body, options) => apiRequest('POST', path, body ?? {}, options),
   patch: (path, body, options) => apiRequest('PATCH', path, body ?? {}, options),
   del: (path, options) => apiRequest('DELETE', path, undefined, options),
+  upload: (path, formData, options) => apiRequest('POST', path, formData, options),
 };

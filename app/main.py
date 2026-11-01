@@ -19,7 +19,7 @@ from app.database import enable_wal, fetch_value, get_connection
 from app.errors import register_exception_handlers
 from app.routers import (announcements, assessments, attendance, audit_logs, auth, billing, courses,
                          dashboard, departments, enrollments, offerings, reports, rooms, schedules,
-                         semesters, students, teachers)
+                         semesters, students, teachers, school_content)
 
 
 @asynccontextmanager
@@ -78,7 +78,8 @@ app.add_middleware(SecurityHeadersMiddleware)
 
 # Every router lives under /api
 for module in (auth, dashboard, departments, teachers, students, courses, rooms, semesters, offerings,
-               schedules, enrollments, attendance, assessments, billing, announcements, audit_logs, reports):
+               schedules, enrollments, attendance, assessments, billing, announcements, school_content,
+               audit_logs, reports):
     app.include_router(module.router, prefix="/api")
 
 # The frontend: plain files. Mounted LAST, so /api/... routes win.
@@ -108,4 +109,6 @@ def health() -> dict | JSONResponse:
     return {"status": "ok"}
 
 
+config.MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/media", StaticFiles(directory=config.MEDIA_DIR), name="media")
 app.mount("/", StaticFiles(directory=config.FRONTEND_DIR, html=True), name="frontend")

@@ -42,6 +42,7 @@ const ALL_ROLES = ['admin', 'teacher', 'student', 'accountant'];
 const NAV_SECTIONS = [
   { label: 'Overview', items: [
     { page: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard', roles: ALL_ROLES },
+    { page: 'school-content', label: 'Notices & Activities', icon: 'newspaper', roles: ALL_ROLES },
   ] },
   { label: 'Academic', items: [
     { page: 'departments', label: 'Classes & Sections', icon: 'building-2', roles: ['admin'] },
@@ -693,6 +694,7 @@ function field(opts) {
     `id="${id}"`, `name="${opts.name}"`,
     opts.required ? 'required' : '', opts.disabled ? 'disabled' : '',
     opts.placeholder ? `placeholder="${escapeHtml(opts.placeholder)}"` : '',
+    opts.accept ? `accept="${escapeHtml(opts.accept)}"` : '',
     opts.min !== undefined ? `min="${opts.min}"` : '', opts.max !== undefined ? `max="${opts.max}"` : '',
     opts.step !== undefined ? `step="${opts.step}"` : '', opts.pattern ? `pattern="${opts.pattern}"` : '',
     opts.maxlength ? `maxlength="${opts.maxlength}"` : '', opts.minlength ? `minlength="${opts.minlength}"` : '',

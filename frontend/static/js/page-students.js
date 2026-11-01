@@ -24,7 +24,9 @@ async function initStudents({ content }) {
     searchPlaceholder: 'Search name, code or email…',
     defaultSort: 'student_code',
     filters: [
-      { name: 'department_id', label: 'Department', options: departmentOptions },
+      { name: 'grade_level', label: 'Class', options: Array.from({ length: 12 }, (_, i) => ({ value: i + 1, label: `Class ${i + 1}` })) },
+      { name: 'section', label: 'Section', options: ['A', 'B', 'C', 'D'].map((s) => ({ value: s, label: `Section ${s}` })) },
+      { name: 'department_id', label: 'School unit', options: departmentOptions },
       { name: 'status', label: 'Status', options: STUDENT_STATUSES.map((s) => ({ value: s, label: titleCase(s) })) },
     ],
     toolbarHtml: `<button type="button" id="new-student" class="${btnClass('primary')}">${icon('plus', 16)} New student</button>`,
@@ -34,7 +36,7 @@ async function initStudents({ content }) {
       { key: 'grade_level', label: 'Class', sortable: true, render: (r) => `Class ${escapeHtml(String(r.grade_level))}-${escapeHtml(r.section)}` },
       { key: 'full_name', label: 'Name', sortable: true, render: (r) => `
           <div class="min-w-[160px]"><p class="font-medium text-ink">${escapeHtml(r.full_name)}</p><p class="text-xs text-muted">${escapeHtml(r.email)}</p></div>` },
-      { key: 'department_code', label: 'Dept', sortable: true },
+      { key: 'department_code', label: 'School unit', sortable: true },
       { key: 'admission_date', label: 'Admitted', sortable: true, render: (r) => formatDate(r.admission_date), className: 'whitespace-nowrap' },
       { key: 'cgpa', label: 'CGPA', sortable: true, className: 'tabular-nums', render: (r) => (r.cgpa === null ? '<span class="text-muted">—</span>' : Number(r.cgpa).toFixed(2)) },
       { key: 'status', label: 'Status', sortable: true, render: (r) => badge(r.status) },
@@ -70,7 +72,7 @@ function openNewStudentForm(departmentOptions, list) {
           ${field({ name: 'student_code', label: 'Student code', required: true, pattern: '[A-Z0-9\\-]{4,20}', title: '4–20 capital letters or digits, e.g. CSE26061', placeholder: 'CSE26061' })}
           ${field({ name: 'grade_level', label: 'Class / grade', type: 'number', required: true, min: 1, max: 12, value: 1 })}
           ${field({ name: 'section', label: 'Section', required: true, value: 'A', placeholder: 'A' })}
-          ${field({ name: 'department_id', label: 'Department', type: 'select', number: true, required: true, options: departmentOptions })}
+          ${field({ name: 'department_id', label: 'School unit', type: 'select', number: true, required: true, options: departmentOptions })}
           ${field({ name: 'admission_date', label: 'Admission date', type: 'date', required: true, value: todayISO() })}
           ${field({ name: 'status', label: 'Status', type: 'select', noEmpty: true, value: 'active', options: STUDENT_STATUSES.map((s) => ({ value: s, label: titleCase(s) })) })}
         </div>

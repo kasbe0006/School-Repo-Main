@@ -276,6 +276,12 @@ CASES = [
     ("announcements.target_role must be NULL or a role",
      "INSERT INTO announcements (title, body, posted_by, target_role) VALUES ('T', 'B', :admin_user_id, 'everyone')",
      "CHECK"),
+    ("school_content.kind must be known",
+     """INSERT INTO school_content (kind, title, description, created_by)
+        VALUES ('course', 'T', 'B', :admin_user_id)""", "CHECK"),
+    ("school_content.created_by must exist",
+     """INSERT INTO school_content (kind, title, description, created_by)
+        VALUES ('notice', 'Title', 'Body', :missing)""", "FOREIGN KEY"),
     ("audit_logs.action must be INSERT / UPDATE / DELETE",
      "INSERT INTO audit_logs (table_name, record_id, action) VALUES ('users', 1, 'SELECT')", "CHECK"),
     ("mv_department_performance: one row per (department, semester)",
@@ -300,8 +306,8 @@ def test_every_table_is_covered():
     tables = ["users", "departments", "teachers", "students", "student_profiles", "semesters", "courses",
               "course_prerequisites", "rooms", "course_offerings", "class_schedules", "enrollments",
               "attendance", "assessments", "assessment_results", "fee_structures", "invoices",
-              "invoice_items", "payments", "announcements", "audit_logs"]
-    assert len(tables) == 21
+              "invoice_items", "payments", "announcements", "school_content", "audit_logs"]
+    assert len(tables) == 22
     missing = [table for table in tables if f" {table} " not in all_sql and f" {table}\n" not in all_sql]
     assert missing == []
 
@@ -419,7 +425,7 @@ def test_offering_may_be_exactly_full(conn, world):
 # ---------------------------------------------------------------------------
 def test_schema_has_all_objects(conn):
     tables = list_tables(conn)
-    assert count_core_tables(tables) == 21
+    assert count_core_tables(tables) == 22
     assert "mv_department_performance" in tables
 
     def number_of(kind: str) -> int:
@@ -427,6 +433,6 @@ def test_schema_has_all_objects(conn):
                            (kind,))
 
     assert number_of("view") == 5
-    assert number_of("trigger") == 34
+    assert number_of("trigger") == 35
     assert number_of("index") >= 26
     assert fetch_value(conn, "PRAGMA journal_mode") == "wal"

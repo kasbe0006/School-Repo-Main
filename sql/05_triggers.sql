@@ -157,6 +157,12 @@ BEGIN
     UPDATE announcements SET updated_at = datetime('now') WHERE id = NEW.id;
 END;
 
+CREATE TRIGGER trg_school_content_updated_at AFTER UPDATE ON school_content
+FOR EACH ROW WHEN NEW.updated_at = OLD.updated_at
+BEGIN
+    UPDATE school_content SET updated_at = datetime('now') WHERE id = NEW.id;
+END;
+
 
 -- =====================================================================
 -- 2) enrolled_count sync

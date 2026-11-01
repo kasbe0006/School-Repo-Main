@@ -10,7 +10,7 @@ const MAX_CREDITS = 21;
 
 function initEnrollment({ content }) {
   content.innerHTML = `
-    ${pageHeader('Course enrollment', 'Pick your courses for the active semester. The rules are checked by the server.')}
+    ${pageHeader('Subject selection', 'Choose subjects for the active academic term.')}
     <div id="summary" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">${skeletonCards(3)}</div>
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
       <div class="xl:col-span-2 bg-white rounded-xl border border-line shadow-sm">
@@ -18,8 +18,8 @@ function initEnrollment({ content }) {
           <h3 class="text-sm font-semibold tracking-tight text-ink">Available offerings</h3>
           <div class="sm:ml-auto flex flex-col sm:flex-row gap-2">
             <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">${icon('search', 16)}</span>
-              <input id="search" type="search" placeholder="Search course…" class="${INPUT_CLASS} pl-9 sm:w-56"></div>
-            <select id="dept-filter" class="${INPUT_CLASS} sm:w-36" aria-label="Department"><option value="">All depts</option></select>
+              <input id="search" type="search" placeholder="Search subject…" class="${INPUT_CLASS} pl-9 sm:w-56"></div>
+              <select id="dept-filter" class="${INPUT_CLASS} sm:w-36" aria-label="School group"><option value="">All groups</option></select>
             <label class="inline-flex items-center gap-2 text-xs text-ink whitespace-nowrap h-9">
               <input id="eligible-only" type="checkbox" class="h-4 w-4 rounded border-line text-primary-600 focus:ring-primary-500"> Only eligible</label>
           </div>
@@ -28,7 +28,7 @@ function initEnrollment({ content }) {
       </div>
       <div class="bg-white rounded-xl border border-line shadow-sm self-start">
         <div class="px-5 h-14 flex items-center justify-between border-b border-line">
-          <h3 class="text-sm font-semibold tracking-tight text-ink">My courses</h3><span class="text-muted">${icon('clipboard-list', 18)}</span>
+          <h3 class="text-sm font-semibold tracking-tight text-ink">My subjects</h3><span class="text-muted">${icon('clipboard-list', 18)}</span>
         </div>
         <div id="my-courses" class="p-5 space-y-3">${skeletonBlock('h-12 w-full')}${skeletonBlock('h-12 w-full')}</div>
       </div>
@@ -69,9 +69,9 @@ function initEnrollment({ content }) {
 
     // Summary cards
     document.getElementById('summary').innerHTML = `
-      ${statCard({ label: 'Credits this semester', value: `${credits} / ${MAX_CREDITS}`, iconName: 'book-open',
-                   delta: `${MAX_CREDITS - credits} credits left`, deltaType: credits >= MAX_CREDITS ? 'danger' : 'success' })}
-      ${statCard({ label: 'Enrolled courses', value: mine.length, iconName: 'clipboard-list' })}
+      ${statCard({ label: 'Periods this term', value: `${credits} / ${MAX_CREDITS}`, iconName: 'book-open',
+                   delta: `${MAX_CREDITS - credits} periods left`, deltaType: credits >= MAX_CREDITS ? 'danger' : 'success' })}
+      ${statCard({ label: 'Selected subjects', value: mine.length, iconName: 'clipboard-list' })}
       ${statCard({ label: 'Registration', value: semester?.registration_open ? 'Open' : 'Closed', iconName: 'calendar-range',
                    delta: semester ? `${formatDate(semester.registration_start)} – ${formatDate(semester.registration_end)}` : '',
                    deltaType: semester?.registration_open ? 'success' : 'danger' })}`;
@@ -84,7 +84,7 @@ function initEnrollment({ content }) {
     const offeringsBox = document.getElementById('offerings');
     offeringsBox.innerHTML = visible.length ? renderTable({
       columns: [
-        { key: 'course_code', label: 'Course', render: (o) => `
+        { key: 'course_code', label: 'Subject', render: (o) => `
             <div class="min-w-[200px]"><p class="font-medium text-ink">${escapeHtml(o.course_code)}-${escapeHtml(o.section)} <span class="font-normal text-muted">· ${o.credits} cr</span></p>
             <p class="text-xs text-muted">${escapeHtml(o.title)}</p>
             ${o.prerequisite_codes ? `<p class="text-[11px] text-muted mt-0.5">Needs: ${escapeHtml(o.prerequisite_codes)}</p>` : ''}
@@ -111,9 +111,9 @@ function initEnrollment({ content }) {
           <p class="text-sm font-medium text-ink truncate">${escapeHtml(o.course_code)}-${escapeHtml(o.section)}</p>
           <p class="text-xs text-muted truncate">${escapeHtml(o.title)} · ${o.credits} cr</p>
         </div>
-        <button type="button" data-drop="${o.my_enrollment_id}" data-code="${escapeHtml(o.course_code)}" class="${btnClass('ghost', 'sm')} text-danger">Drop</button>
+        <button type="button" data-drop="${o.my_enrollment_id}" data-code="${escapeHtml(o.course_code)}" class="${btnClass('ghost', 'sm')} text-danger">Remove</button>
       </div>`).join('') + `<div class="pt-1">${progressBar((credits / MAX_CREDITS) * 100)}<p class="text-xs text-muted mt-1">${credits} of ${MAX_CREDITS} credits used</p></div>`
-      : emptyState({ iconName: 'clipboard-list', title: 'No courses yet', subtitle: 'Enroll from the list on the left.' });
+      : emptyState({ iconName: 'clipboard-list', title: 'No subjects yet', subtitle: 'Select subjects from the list on the left.' });
     refreshIcons();
   }
 

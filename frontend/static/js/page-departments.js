@@ -3,7 +3,7 @@
  */
 
 function initDepartments({ content }) {
-  content.innerHTML = pageHeader('Departments', 'Academic departments, their heads and their size.') + '<div id="list"></div>';
+  content.innerHTML = pageHeader('Classes & Sections', 'School groups, their teachers and student counts.') + '<div id="list"></div>';
 
   const list = createListView({
     mount: document.getElementById('list'),
@@ -11,7 +11,7 @@ function initDepartments({ content }) {
     searchPlaceholder: 'Search name, code or head…',
     defaultSort: 'code',
     filters: [{ name: 'is_active', label: 'Status', options: [{ value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' }] }],
-    toolbarHtml: `<button type="button" id="new-department" class="${btnClass('primary')}">${icon('plus', 16)} New department</button>`,
+    toolbarHtml: `<button type="button" id="new-department" class="${btnClass('primary')}">${icon('plus', 16)} New school group</button>`,
     emptyIcon: 'building-2',
     emptyTitle: 'No departments yet',
     columns: [
@@ -20,7 +20,7 @@ function initDepartments({ content }) {
       { key: 'head_teacher_name', label: 'Head', render: (r) => (r.head_teacher_name ? escapeHtml(r.head_teacher_name) : '<span class="text-muted">Not set</span>') },
       { key: 'student_count', label: 'Students', sortable: true, className: 'tabular-nums' },
       { key: 'teacher_count', label: 'Teachers', sortable: true, className: 'tabular-nums' },
-      { key: 'course_count', label: 'Courses', sortable: true, className: 'tabular-nums' },
+      { key: 'course_count', label: 'Subjects', sortable: true, className: 'tabular-nums' },
       { key: 'is_active', label: 'Status', render: (r) => badge(r.is_active ? 'active' : 'inactive') },
       { key: 'actions', label: '', className: 'text-right', render: () => rowAction('edit', 'pencil', 'Edit') },
     ],

@@ -30,8 +30,9 @@ PROFILE_COLUMNS = ["date_of_birth", "gender", "blood_group", "address_line", "ci
 
 
 def list_students(conn: sqlite3.Connection, list_args: dict, department_id: int | None = None,
-                  status: str | None = None) -> dict:
-    """One page of students, with optional department and status filters."""
+                  status: str | None = None, grade_level: int | None = None,
+                  section: str | None = None) -> dict:
+    """One page of students, with optional class, section, department and status filters."""
     conditions, params = [], []
     if department_id is not None:
         conditions.append("s.department_id = ?")
@@ -39,6 +40,12 @@ def list_students(conn: sqlite3.Connection, list_args: dict, department_id: int 
     if status:
         conditions.append("s.status = ?")
         params.append(status)
+    if grade_level is not None:
+        conditions.append("s.grade_level = ?")
+        params.append(grade_level)
+    if section:
+        conditions.append("s.section = ?")
+        params.append(section)
     return paginate(
         conn, STUDENT_SELECT + where_clause(conditions), params, list_args,
         search_columns=["full_name", "student_code", "email"],
@@ -61,10 +68,11 @@ def insert_student(conn: sqlite3.Connection, user_id: int, data: dict) -> int:
     return execute(
         conn,
         """INSERT INTO students (user_id, department_id, student_code, first_name, last_name,
-                                 admission_date, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                                 admission_date, grade_level, section, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (user_id, data["department_id"], data["student_code"], data["first_name"], data["last_name"],
-         data["admission_date"], data.get("status", "active")),
+         data["admission_date"], data.get("grade_level", 1), data.get("section", "A"),
+         data.get("status", "active")),
     )
 
 

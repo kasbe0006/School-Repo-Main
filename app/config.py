@@ -45,6 +45,8 @@ def resolve_path(value: str) -> Path:
 DB_PATH: Path = resolve_path(os.getenv("UCMS_DB_PATH", "ucms.db"))
 SQL_DIR: Path = BASE_DIR / "sql"
 BACKUP_DIR: Path = BASE_DIR / "backups"
+MEDIA_DIR: Path = resolve_path(os.getenv("MEDIA_DIR", "media"))
+MAX_MEDIA_BYTES: int = int(os.getenv("MAX_MEDIA_BYTES", str(50 * 1024 * 1024)))
 
 # ---- Auth ----
 JWT_SECRET: str = os.getenv("JWT_SECRET", "dev-secret-change-me")

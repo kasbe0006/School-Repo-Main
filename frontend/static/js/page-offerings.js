@@ -219,5 +219,5 @@ async function openRoster(offering) {
 // Start the page. This is at the BOTTOM on purpose: every constant and function
 // above exists by now (a `const` used before its line throws a ReferenceError).
 // ---------------------------------------------------------------------------
-const session = startPage('offerings', 'Offerings');
+const session = startPage('offerings', 'Class Subjects');
 if (session) initOfferings(session);

@@ -28,7 +28,7 @@ services:
       - key: SCHOOL_SHORT_NAME
         value: Your School
       - key: SCHOOL_TAGLINE
-        value: Simple school management system
+        value: School management made simple
     disk:
       name: ucms-data
       mountPath: /var/data

@@ -101,7 +101,7 @@ function timeToMinutes(text) {
   return h * 60 + m;
 }
 
-/** The university grading scale (same as app/services/grading_service.py) */
+/** The school grading scale (same as app/services/grading_service.py) */
 const GRADE_SCALE = [
   [80, 4.0, 'A+'], [75, 3.75, 'A'], [70, 3.5, 'A-'], [65, 3.25, 'B+'], [60, 3.0, 'B'],
   [55, 2.75, 'B-'], [50, 2.5, 'C+'], [45, 2.25, 'C'], [40, 2.0, 'D'], [0, 0.0, 'F'],

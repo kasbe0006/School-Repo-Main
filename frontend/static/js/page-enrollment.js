@@ -153,5 +153,5 @@ function initEnrollment({ content }) {
 // Start the page. This is at the BOTTOM on purpose: every constant and function
 // above exists by now (a `const` used before its line throws a ReferenceError).
 // ---------------------------------------------------------------------------
-const session = startPage('enrollment', 'Enrollment');
+const session = startPage('enrollment', 'Subject Enrollment');
 if (session) initEnrollment(session);

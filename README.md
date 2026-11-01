@@ -1,4 +1,4 @@
-# UCMS: Simple School Management System
+# School ERP: Simple School Management System
 
 **A simple school management platform for grades 1–12:
 students, classes, attendance, grading, billing and announcements.
@@ -44,7 +44,7 @@ It has role-based portals and a database layer that enforces its own business ru
 
 ## Overview
 
-UCMS covers the daily lifecycle of a school year in one application: administrators set up
+School ERP covers the daily lifecycle of a school year in one application: administrators set up
 classes, subjects, rooms and offerings; students register for courses; teachers take attendance
 and publish grades; and accountants bill and collect fees.
 

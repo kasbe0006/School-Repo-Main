@@ -1,1 +1,1 @@
-"""UCMS backend package (FastAPI + raw sqlite3)."""
+"""School ERP backend package (FastAPI + raw sqlite3)."""

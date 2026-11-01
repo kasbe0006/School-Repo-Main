@@ -50,8 +50,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="UCMS API",
-    description="Simple school management system for grades 1-12: FastAPI + raw SQLite.",
+    title="School ERP API",
+    description="School management system for grades 1-12: FastAPI + raw SQLite.",
     version="1.0.0",
     lifespan=lifespan,
 )

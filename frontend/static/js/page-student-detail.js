@@ -40,7 +40,7 @@ function initStudentDetail({ user, content }) {
     try {
       student = await api.get(`/students/${studentId}`, null, { silent: true });
       document.querySelector('header h1').textContent = student.full_name;
-      document.title = `${student.full_name} · UCMS`;
+      document.title = `${student.full_name} · ${branding.school_short_name}`;
       renderHeader();
       renderTabs(document.getElementById('tabs'), TABS, initialTab, showTab);
       showTab(initialTab);

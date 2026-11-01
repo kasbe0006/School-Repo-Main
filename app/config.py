@@ -56,9 +56,9 @@ ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development").strip().lower()
 AUTO_SEED: bool = os.getenv("AUTO_SEED", "true").strip().lower() in {"1", "true", "yes", "on"}
 PROVISION_ADMIN_EMAIL: str = os.getenv("PROVISION_ADMIN_EMAIL", "").strip().lower()
 PROVISION_ADMIN_PASSWORD: str = os.getenv("PROVISION_ADMIN_PASSWORD", "")
-SCHOOL_NAME: str = os.getenv("SCHOOL_NAME", "UCMS")
-SCHOOL_SHORT_NAME: str = os.getenv("SCHOOL_SHORT_NAME", "UCMS")
-SCHOOL_TAGLINE: str = os.getenv("SCHOOL_TAGLINE", "Simple school management system")
+SCHOOL_NAME: str = os.getenv("SCHOOL_NAME", "School ERP")
+SCHOOL_SHORT_NAME: str = os.getenv("SCHOOL_SHORT_NAME", "School ERP")
+SCHOOL_TAGLINE: str = os.getenv("SCHOOL_TAGLINE", "School management made simple")
 LOGIN_MAX_FAILURES: int = int(os.getenv("LOGIN_MAX_FAILURES", "5"))
 LOGIN_FAILURE_WINDOW_SECONDS: int = int(os.getenv("LOGIN_FAILURE_WINDOW_SECONDS", "300"))
 

@@ -209,7 +209,7 @@ def grade_chart(conn: sqlite3.Connection, **filters) -> dict:
 
 
 def admin_dashboard(conn: sqlite3.Connection, semester: dict | None) -> dict:
-    """University-wide numbers for the admin."""
+    """School-wide numbers for the admin."""
     semester_id = semester["id"] if semester else None
     students = fetch_value(conn, "SELECT COUNT(*) FROM students WHERE status = 'active'")
     new_students = fetch_value(conn, "SELECT COUNT(*) FROM students WHERE admission_date >= date('now', '-30 days')")

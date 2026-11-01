@@ -69,7 +69,7 @@ def main() -> None:
     """Prepare the database, then run the web server."""
     ensure_database()
     host_for_link = "localhost" if config.HOST in ("127.0.0.1", "0.0.0.0") else config.HOST
-    print(f"\nUCMS is running at http://{host_for_link}:{config.PORT}   (API docs: /docs)")
+    print(f"\nSchool ERP is running at http://{host_for_link}:{config.PORT}   (API docs: /docs)")
     if config.AUTO_SEED:
         print(f"Demo logins (password {DEMO_PASSWORD}): admin@ucms.edu, teacher@ucms.edu, "
               "student@ucms.edu, accountant@ucms.edu\n")

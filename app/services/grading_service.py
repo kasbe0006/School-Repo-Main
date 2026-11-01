@@ -18,7 +18,7 @@ import sqlite3
 from app.database import fetch_one, fetch_value, transaction
 from app.errors import BusinessRuleError, not_found
 
-# The university grading scale, from the highest band to the lowest.
+# The school grading scale, from the highest band to the lowest.
 # Each entry: (minimum marks, grade point, letter grade)
 GRADE_SCALE: list[tuple[float, float, str]] = [
     (80, 4.00, "A+"),

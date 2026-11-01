@@ -18,7 +18,8 @@ DEFAULTS = {
 
 def get_settings(conn: sqlite3.Connection) -> dict:
     row = fetch_one(conn, "SELECT * FROM school_settings WHERE id = 1")
-    return {**DEFAULTS, **(row or {})}
+    values = {**DEFAULTS, **(row or {})}
+    return {key: values[key] for key in DEFAULTS}
 
 
 def update_settings(conn: sqlite3.Connection, changes: dict) -> dict:

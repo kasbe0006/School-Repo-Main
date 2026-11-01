@@ -3,6 +3,7 @@ const CONTENT_KINDS = [
   { value: 'activity', label: 'Activity / Event' },
   { value: 'gallery', label: 'Photo / Video' },
   { value: 'admission', label: 'Admission information' },
+  { value: 'meal', label: 'Mid-day meal schedule' },
 ];
 
 function initSchoolContent({ content, user }) {

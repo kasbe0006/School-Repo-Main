@@ -424,7 +424,7 @@ CREATE TABLE announcements (
 -- ---------------------------------------------------------------------
 CREATE TABLE school_content (
     id                   INTEGER PRIMARY KEY AUTOINCREMENT,
-    kind                 TEXT NOT NULL CHECK (kind IN ('notice','activity','gallery','admission')),
+    kind                 TEXT NOT NULL CHECK (kind IN ('notice','activity','gallery','admission','meal')),
     title                TEXT NOT NULL CHECK (length(trim(title)) BETWEEN 3 AND 200),
     description          TEXT NOT NULL CHECK (length(trim(description)) BETWEEN 3 AND 10000),
     event_date           TEXT NULL,

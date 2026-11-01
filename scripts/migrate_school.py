@@ -8,6 +8,45 @@ def _columns(conn: sqlite3.Connection, table: str) -> set[str]:
     return {row[1] for row in conn.execute(f'PRAGMA table_info("{table}")')}
 
 
+def _add_meal_content_kind(conn: sqlite3.Connection) -> None:
+    """Rebuild older school-content tables whose CHECK omitted meal schedules."""
+    definition = conn.execute(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'school_content'"
+    ).fetchone()
+    if not definition or "'meal'" in definition[0]:
+        return
+    conn.execute("DROP TRIGGER IF EXISTS trg_school_content_updated_at")
+    conn.execute(
+        """CREATE TABLE school_content_new (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            kind TEXT NOT NULL CHECK (kind IN ('notice','activity','gallery','admission','meal')),
+            title TEXT NOT NULL CHECK (length(trim(title)) BETWEEN 3 AND 200),
+            description TEXT NOT NULL CHECK (length(trim(description)) BETWEEN 3 AND 10000),
+            event_date TEXT NULL,
+            event_end_date TEXT NULL,
+            location TEXT NULL,
+            image_url TEXT NULL,
+            video_url TEXT NULL,
+            documents_required TEXT NULL,
+            scholarship_info TEXT NULL,
+            is_published INTEGER NOT NULL DEFAULT 1 CHECK (is_published IN (0,1)),
+            created_by INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+            CHECK (event_end_date IS NULL OR event_date IS NULL OR event_end_date >= event_date)
+        )"""
+    )
+    conn.execute(
+        """INSERT INTO school_content_new
+           SELECT id, kind, title, description, event_date, event_end_date, location,
+                  image_url, video_url, documents_required, scholarship_info, is_published,
+                  created_by, created_at, updated_at
+           FROM school_content"""
+    )
+    conn.execute("DROP TABLE school_content")
+    conn.execute("ALTER TABLE school_content_new RENAME TO school_content")
+
+
 def migrate_school_schema(conn: sqlite3.Connection) -> None:
     """Add school-specific fields and content tables when they are missing."""
     student_columns = _columns(conn, "students")
@@ -23,7 +62,7 @@ def migrate_school_schema(conn: sqlite3.Connection) -> None:
         conn.execute(
             """CREATE TABLE IF NOT EXISTS school_content (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                kind TEXT NOT NULL CHECK (kind IN ('notice','activity','gallery','admission')),
+                kind TEXT NOT NULL CHECK (kind IN ('notice','activity','gallery','admission','meal')),
                 title TEXT NOT NULL CHECK (length(trim(title)) BETWEEN 3 AND 200),
                 description TEXT NOT NULL CHECK (length(trim(description)) BETWEEN 3 AND 10000),
                 event_date TEXT NULL,
@@ -40,6 +79,7 @@ def migrate_school_schema(conn: sqlite3.Connection) -> None:
                 CHECK (event_end_date IS NULL OR event_date IS NULL OR event_end_date >= event_date)
             )"""
         )
+        _add_meal_content_kind(conn)
         conn.execute(
             """CREATE TABLE IF NOT EXISTS school_settings (
                 id INTEGER PRIMARY KEY CHECK (id = 1),

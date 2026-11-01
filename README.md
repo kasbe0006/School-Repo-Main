@@ -44,7 +44,9 @@ It has role-based portals and a database layer that enforces its own business ru
 
 ## Overview
 
-School ERP is built only for ZPPS Mamdapur: administrators manage classes, sections, students,
+School ERP is built only for ZPPS Mamdapur. Visitors can open the public school website without
+logging in to view published notices, photos, videos, activities, admission information,
+scholarships and mid-day meal schedules. Administrators manage classes, sections, students,
 staff and subjects; teachers take attendance and publish results; accountants manage school fees;
 and school staff can publish notices, activities, photos, videos, admission requirements and
 scholarship information. An administrator can also update the school's name, logo, tagline and
@@ -257,6 +259,9 @@ year controls the timetable, attendance, results and billing views.
 
 Admins can create an accountant login from **Staff → Add accountant**. The accountant receives
 only billing access and should change the initial password after the first login.
+
+The public school website is the default home page for visitors. Staff use **Staff sign in**;
+only administrators can create or edit the published school information.
 
 ### Bulk student accounts
 

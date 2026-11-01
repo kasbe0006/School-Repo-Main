@@ -7,6 +7,13 @@ function escapePublic(value) {
 }
 
 function publicCard(item) {
+  const kindLabels = {
+    notice: 'Notice',
+    activity: 'Activity / Event',
+    gallery: 'Photo / Video',
+    admission: 'Admission information',
+    meal: 'Mid-day meal schedule',
+  };
   const media = item.image_url
     ? `<img src="${escapePublic(item.image_url)}" alt="" class="w-full h-48 object-cover rounded-lg mb-4">`
     : item.video_url
@@ -20,7 +27,7 @@ function publicCard(item) {
     item.scholarship_info ? `<p><strong>Scholarships:</strong> ${escapePublic(item.scholarship_info)}</p>` : '',
   ].join('');
   return `<article class="bg-white rounded-xl border border-line shadow-sm p-5">${media}
-    <p class="text-xs font-semibold uppercase tracking-wide text-primary-600">${escapePublic(item.kind)}</p>
+    <p class="text-xs font-semibold uppercase tracking-wide text-primary-600">${escapePublic(kindLabels[item.kind] || item.kind)}</p>
     <h2 class="text-lg font-semibold text-ink mt-1">${escapePublic(item.title)}</h2>
     <p class="text-sm text-slate-600 whitespace-pre-line mt-3">${escapePublic(item.description)}</p>
     ${date}${details ? `<div class="text-xs text-slate-600 space-y-1 mt-3">${details}</div>` : ''}

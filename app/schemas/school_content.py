@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-ContentKind = Literal["notice", "activity", "gallery", "admission"]
+ContentKind = Literal["notice", "activity", "gallery", "admission", "meal"]
 
 
 class SchoolContentCreate(BaseModel):

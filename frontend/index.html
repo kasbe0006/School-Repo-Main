@@ -7,9 +7,9 @@
   <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
   <script src="/static/js/auth.js"></script>
   <script>
-    // Entry point: logged-in users go to their home page, everyone else to the login page.
+    // Entry point: staff users go to their dashboard; visitors see the public school website.
     const user = getUser();
-    window.location.replace(getToken() && user ? homePageFor(user.role) : '/pages/login.html');
+    window.location.replace(getToken() && user ? homePageFor(user.role) : '/pages/school-public.html');
   </script>
 </head>
 <body style="background:#f8fafc"></body>

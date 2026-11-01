@@ -1,6 +1,6 @@
 """Schemas for login."""
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, EmailStr, Field, model_validator
 
 from app.schemas.common import Password, StrictModel
 
@@ -27,3 +27,9 @@ class PasswordChangeRequest(StrictModel):
         if self.current_password == self.new_password:
             raise ValueError("New password must be different from the current password")
         return self
+
+
+class AccountantCreate(StrictModel):
+    """Admin-created billing account."""
+    email: EmailStr
+    password: Password

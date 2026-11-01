@@ -32,7 +32,8 @@ async function initTeachers({ content }) {
       { name: 'department_id', label: 'School group', options: departmentOptions },
       { name: 'status', label: 'Status', options: TEACHER_STATUSES.map((s) => ({ value: s, label: titleCase(s) })) },
     ],
-    toolbarHtml: `<button type="button" id="new-teacher" class="${btnClass('primary')}">${icon('plus', 16)} Add staff member</button>`,
+    toolbarHtml: `<button type="button" id="new-accountant" class="${btnClass('secondary')}">${icon('wallet', 16)} Add accountant</button>
+      <button type="button" id="new-teacher" class="${btnClass('primary')}">${icon('plus', 16)} Add staff member</button>`,
     emptyIcon: 'users',
     columns: [
       { key: 'employee_code', label: 'Code', sortable: true, render: (r) => `<span class="font-medium text-ink">${escapeHtml(r.employee_code)}</span>` },
@@ -50,6 +51,7 @@ async function initTeachers({ content }) {
   });
 
   document.getElementById('new-teacher').addEventListener('click', () => openTeacherForm(null));
+  document.getElementById('new-accountant').addEventListener('click', openAccountantForm);
 
   /** Create or edit a teacher (create also makes the login account). */
   function openTeacherForm(teacher) {
@@ -86,6 +88,7 @@ async function initTeachers({ content }) {
             });
             if (!ok) throw new Error('cancelled');
           }
+
           return api.patch(`/teachers/${teacher.id}`, values);
         }
         return api.post('/teachers', values);
@@ -93,6 +96,18 @@ async function initTeachers({ content }) {
       onSuccess: (saved) => { toast(`${saved.full_name} ${isEdit ? 'updated' : 'created'}`); list.reload(); },
     });
   }
+}
+
+function openAccountantForm() {
+  formModal({
+    title: 'Add accountant',
+    submitText: 'Create accountant login',
+    fieldsHtml: `
+      ${field({ name: 'email', label: 'Email (login)', type: 'email', required: true, placeholder: 'accounts@zpps-mamdapur.edu' })}
+      ${field({ name: 'password', label: 'Initial password', type: 'password', required: true, minlength: 8, help: 'Give it privately to the accountant.' })}`,
+    onSubmit: (values) => api.post('/auth/accountants', values),
+    onSuccess: (account) => toast(`Accountant login created for ${account.email}`),
+  });
 }
 
 /** Slide-over with the staff member's profile and teaching workload. */

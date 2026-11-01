@@ -12,10 +12,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app import config
 from app.database import get_db, transaction
-from app.repositories.users import (get_user_by_email, get_user_password_hash, update_last_login,
+from app.errors import BusinessRuleError
+from app.repositories.users import (get_user_by_email, get_user_password_hash, insert_user, update_last_login,
                                     update_password)
-from app.schemas.auth import LoginRequest, PasswordChangeRequest
-from app.security import create_access_token, get_current_user, hash_password, load_user, verify_password
+from app.schemas.auth import AccountantCreate, LoginRequest, PasswordChangeRequest
+from app.security import create_access_token, get_current_user, hash_password, load_user, require_role, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 _login_failures: dict[str, list[float]] = {}
@@ -80,6 +81,20 @@ def login(request: Request, body: LoginRequest, conn: sqlite3.Connection = Depen
 def me(user: dict = Depends(get_current_user)) -> dict:
     """The logged-in user, with teacher_id / student_id / department_id if they have one."""
     return user
+
+
+@router.post("/accountants", status_code=201)
+def create_accountant(
+    body: AccountantCreate,
+    user: dict = Depends(require_role("admin")),
+    conn: sqlite3.Connection = Depends(get_db),
+) -> dict:
+    """Create an accountant login without creating a teaching profile."""
+    if get_user_by_email(conn, body.email):
+        raise BusinessRuleError("An account with this email already exists", status_code=409, field="email")
+    with transaction(conn, user["id"]):
+        account_id = insert_user(conn, body.email, hash_password(body.password), "accountant")
+    return load_user(conn, account_id)
 
 
 @router.post("/change-password")

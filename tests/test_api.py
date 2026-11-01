@@ -34,6 +34,7 @@ STAFF = {"admin", "teacher"}
 ENDPOINTS = [
     ("GET", "/api/auth/me", ALL),
     ("POST", "/api/auth/change-password", ALL),
+    ("POST", "/api/auth/accountants", {"admin"}),
     ("GET", "/api/dashboard/stats", ALL),
     ("GET", "/api/departments", ALL),
     ("POST", "/api/departments", {"admin"}),

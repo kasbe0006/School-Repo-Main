@@ -79,8 +79,8 @@ audit trail by the database. The rules still hold for writes that bypass the API
 - **Accountant:** school fee structures, invoice generation, payment recording (cash, bank,
   bKash, Nagad, card) and collection records.
 
-The visible website intentionally does not expose college-only modules such as semesters,
-enrollment, CGPA, GPA, course prerequisites, rooms or academic reports. Legacy database and API
+The visible website intentionally does not expose college-only modules such as enrollment,
+CGPA, GPA, course prerequisites, rooms or academic reports. Legacy database and API
 names remain only where needed to preserve existing records and calculations.
 
 Every signed-in user can change their password from the key icon in the top navigation.
@@ -254,6 +254,9 @@ administrator portal using real school records.
 
 Admins can change the active school year from **School Settings → School years**. The selected
 year controls the timetable, attendance, results and billing views.
+
+Admins can create an accountant login from **Staff → Add accountant**. The accountant receives
+only billing access and should change the initial password after the first login.
 
 ### Bulk student accounts
 

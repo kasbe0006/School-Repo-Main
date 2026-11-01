@@ -212,7 +212,7 @@ function initStudentDetail({ user, content }) {
     try {
       const data = await api.get(`/students/${studentId}/transcript`, null, { silent: true });
       if (!data.semesters.length) {
-        body.innerHTML = card(emptyState({ iconName: 'award', title: 'No completed courses yet', subtitle: 'Grades appear here once a semester is finalized.' }));
+        body.innerHTML = card(emptyState({ iconName: 'award', title: 'No completed subjects yet', subtitle: 'Results appear here once a school year is finalized.' }));
         refreshIcons();
         return;
       }

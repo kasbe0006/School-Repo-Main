@@ -903,12 +903,12 @@ function loadDepartments() {
   return cached('departments', () => api.get('/departments', { limit: 200, sort: 'code' }, { silent: true }).then((d) => d.items));
 }
 
-/** All semesters, newest first */
+/** All school years, newest first */
 function loadSemesters() {
   return cached('semesters', () => api.get('/semesters', { limit: 200 }, { silent: true }).then((d) => d.items));
 }
 
-/** The active semester (or null) */
+/** The active school year (or null) */
 function loadActiveSemester() {
   return cached('active-semester', () => api.get('/semesters/active', null, { silent: true }).catch(() => null));
 }
@@ -1073,7 +1073,7 @@ function openInvoiceModal(invoiceId, { canPay = false, onChange } = {}) {
       <div class="flex flex-wrap items-start justify-between gap-3 mb-5">
         <div>
           <p class="text-sm font-medium text-ink">${escapeHtml(inv.student_name)} <span class="text-muted font-normal">· ${escapeHtml(inv.student_code)}</span></p>
-          <p class="text-xs text-muted mt-1">Academic term ${escapeHtml(inv.semester_code)} · Issued ${formatDate(inv.issued_at)} · Due ${formatDate(inv.due_date)}</p>
+          <p class="text-xs text-muted mt-1">School year ${escapeHtml(inv.semester_code)} · Issued ${formatDate(inv.issued_at)} · Due ${formatDate(inv.due_date)}</p>
         </div>
         ${badge(inv.status)}
       </div>

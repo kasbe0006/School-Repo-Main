@@ -13,7 +13,7 @@ async function initRoutine({ user, content }) {
   const isAdmin = user.role === 'admin' || user.role === 'accountant';
   const description = {
     student: 'Your classes this week.', teacher: 'Your teaching schedule this week.',
-  }[user.role] || 'All classes of the week. Filter by academic term, school unit or room.';
+  }[user.role] || 'All classes of the week. Filter by school year, school unit or room.';
 
   content.innerHTML = `
     ${pageHeader('Weekly routine', description)}
@@ -35,6 +35,29 @@ async function initRoutine({ user, content }) {
     return;
   }
 
+  if (!active && isAdmin) {
+    document.getElementById('filters').innerHTML = card(emptyState({
+      iconName: 'calendar-plus',
+      title: 'Create the current school year',
+      subtitle: 'The timetable needs an active school year before classes can be scheduled.',
+      actionHtml: `<button type="button" id="create-school-year" class="${btnClass('primary')}">${icon('plus', 16)} Add school year</button>`,
+    }));
+    document.getElementById('create-school-year').addEventListener('click', openSchoolYearForm);
+    refreshIcons();
+    document.getElementById('routine').innerHTML = '';
+    return;
+  }
+  if (!active) {
+    document.getElementById('filters').innerHTML = card(emptyState({
+      iconName: 'calendar-clock',
+      title: 'No active school year',
+      subtitle: 'Ask an administrator to create and activate the current school year.',
+    }));
+    document.getElementById('routine').innerHTML = '';
+    refreshIcons();
+    return;
+  }
+
   const select = (name, label, options, value = '') => `
     <select data-filter="${name}" class="${INPUT_CLASS} sm:w-56" aria-label="${label}">
       ${name === 'semester_id' ? '' : `<option value="">${label}: All</option>`}
@@ -42,7 +65,7 @@ async function initRoutine({ user, content }) {
     </select>`;
   document.getElementById('filters').innerHTML = `
     <div class="flex flex-col sm:flex-row flex-wrap gap-2">
-      ${select('semester_id', 'Semester', toOptions(semesters, (s) => `${s.code}${s.is_active ? ' (active)' : ''}`), active?.id)}
+      ${select('semester_id', 'School year', toOptions(semesters, (s) => `${s.code}${s.is_active ? ' (active)' : ''}`), active?.id)}
       ${isAdmin ? select('department_id', 'Department', toOptions(departments, (d) => d.code), departments[0]?.id) : ''}
       ${isAdmin ? select('room_id', 'Room', toOptions(rooms, (r) => `${r.building} ${r.room_number}`)) : ''}
     </div>`;
@@ -54,6 +77,28 @@ async function initRoutine({ user, content }) {
   };
   document.querySelectorAll('#filters [data-filter]').forEach((el) => el.addEventListener('change', () => loadRoutine(filters(), user)));
   loadRoutine(filters(), user);
+}
+
+function openSchoolYearForm() {
+  formModal({
+    title: 'Add school year',
+    submitText: 'Create school year',
+    fieldsHtml: `
+      ${field({ name: 'name', label: 'School year name', required: true, maxlength: 60, placeholder: '2026-2027' })}
+      ${field({ name: 'code', label: 'Short code', required: true, maxlength: 10, pattern: '[A-Z0-9-]{3,10}', placeholder: '2026-27' })}
+      ${field({ name: 'start_date', label: 'Start date', type: 'date', required: true })}
+      ${field({ name: 'end_date', label: 'End date', type: 'date', required: true })}
+      ${field({ name: 'registration_start', label: 'Admission start', type: 'date', required: true })}
+      ${field({ name: 'registration_end', label: 'Admission end', type: 'date', required: true })}`,
+    onSubmit: (values) => api.post('/semesters', values),
+    onSuccess: async (created) => {
+      await api.patch(`/semesters/${created.id}/activate`);
+      delete dataCache.semesters;
+      delete dataCache['active-semester'];
+      toast('School year created and activated');
+      initRoutine({ user: getUser(), content: document.getElementById('page-content') });
+    },
+  });
 }
 
 async function loadRoutine(filters, user) {

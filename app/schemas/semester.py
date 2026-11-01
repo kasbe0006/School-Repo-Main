@@ -13,8 +13,8 @@ class SemesterCreate(StrictModel):
     The date rules repeat the table's CHECK constraints, so the user gets a
     clear per-field message instead of a raw database error.
     """
-    name: str = Field(min_length=2, max_length=60, examples=["Fall 2026"])
-    code: str = Field(pattern=r"^[A-Z]{3}[0-9]{2}$", examples=["FAL26"])
+    name: str = Field(min_length=2, max_length=60, examples=["2026-2027"])
+    code: str = Field(pattern=r"^[A-Z0-9-]{3,10}$", examples=["2026-27"])
     start_date: date
     end_date: date
     registration_start: date

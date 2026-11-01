@@ -26,14 +26,14 @@ router = APIRouter(prefix="/semesters", tags=["semesters"])
 @router.get("")
 def list_semesters(list_args: dict = Depends(list_params), user: dict = Depends(get_current_user),
                    conn: sqlite3.Connection = Depends(get_db)) -> dict:
-    """Paged list of semesters, newest first."""
+    """Paged list of school years, newest first."""
     return repo.list_semesters(conn, list_args)
 
 
 @router.post("", status_code=201)
 def create_semester(body: SemesterCreate, user: dict = Depends(require_role("admin")),
                     conn: sqlite3.Connection = Depends(get_db)) -> dict:
-    """Create a semester. It starts inactive; use /activate to switch to it."""
+    """Create a school year. It starts inactive; use /activate to switch to it."""
     with transaction(conn, user["id"]):
         semester_id = repo.insert_semester(conn, body.model_dump(mode="json"))
     return repo.get_semester(conn, semester_id)
@@ -42,21 +42,21 @@ def create_semester(body: SemesterCreate, user: dict = Depends(require_role("adm
 # Declared BEFORE /{semester_id}, so "active" is not treated as an id
 @router.get("/active")
 def active_semester(user: dict = Depends(get_current_user), conn: sqlite3.Connection = Depends(get_db)) -> dict | None:
-    """The current semester, or null if none is active."""
+    """The current school year, or null if none is active."""
     return repo.get_active_semester(conn)
 
 
 @router.get("/{semester_id}")
 def get_semester(semester_id: int, user: dict = Depends(get_current_user),
                  conn: sqlite3.Connection = Depends(get_db)) -> dict:
-    """One semester."""
+    """One school year."""
     return found_or_404(repo.get_semester(conn, semester_id), "Semester", semester_id)
 
 
 @router.patch("/{semester_id}/activate")
 def activate(semester_id: int, user: dict = Depends(require_role("admin")),
              conn: sqlite3.Connection = Depends(get_db)) -> dict:
-    """Make this the only active semester."""
+    """Make this the only active school year."""
     activate_semester(conn, semester_id, user["id"])
     return repo.get_semester(conn, semester_id)
 

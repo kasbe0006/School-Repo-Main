@@ -252,6 +252,9 @@ persistent disk. The Render subdomain is free; a custom domain is optional later
 The login page does not expose demo accounts. Create all staff and student accounts from the
 administrator portal using real school records.
 
+Admins can change the active school year from **School Settings → School years**. The selected
+year controls the timetable, attendance, results and billing views.
+
 ### Bulk student accounts
 
 Admins do not need to enter students one by one. On **Students**, choose **Import CSV**,

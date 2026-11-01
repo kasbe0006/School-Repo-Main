@@ -46,6 +46,7 @@ ENDPOINTS = [
     ("GET", "/api/teachers/{teacher_id}/workload", STAFF),
     ("GET", "/api/students", {"admin"}),
     ("POST", "/api/students", {"admin"}),
+    ("POST", "/api/students/import", {"admin"}),
     ("GET", "/api/students/{student_id}", {"admin", "student"}),   # admin, or the student themself
     ("PATCH", "/api/students/{student_id}", {"admin"}),
     ("GET", "/api/students/{student_id}/transcript", {"admin", "student"}),

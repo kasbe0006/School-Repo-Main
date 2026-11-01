@@ -29,7 +29,8 @@ async function initStudents({ content }) {
       { name: 'department_id', label: 'School unit', options: departmentOptions },
       { name: 'status', label: 'Status', options: STUDENT_STATUSES.map((s) => ({ value: s, label: titleCase(s) })) },
     ],
-    toolbarHtml: `<button type="button" id="new-student" class="${btnClass('primary')}">${icon('plus', 16)} New student</button>`,
+    toolbarHtml: `<button type="button" id="import-students" class="${btnClass('secondary')}">${icon('upload', 16)} Import CSV</button>
+      <button type="button" id="new-student" class="${btnClass('primary')}">${icon('plus', 16)} New student</button>`,
     emptyIcon: 'graduation-cap',
     columns: [
       { key: 'student_code', label: 'Code', sortable: true, render: (r) => `<span class="font-medium text-ink">${escapeHtml(r.student_code)}</span>` },
@@ -45,6 +46,53 @@ async function initStudents({ content }) {
   });
 
   document.getElementById('new-student').addEventListener('click', () => openNewStudentForm(departmentOptions, list));
+  document.getElementById('import-students').addEventListener('click', () => openStudentImportForm(list));
+}
+
+function openStudentImportForm(list) {
+  const formId = 'student-import-form';
+  const modal = openModal({
+    title: 'Import students from CSV',
+    size: 'max-w-2xl',
+    body: `<div class="mb-4 rounded-lg bg-blue-50 text-blue-800 text-xs p-3">
+      Upload one CSV for a class or the whole school. Every row receives the same initial password,
+      and each student keeps their own email login. Students should change it after signing in.
+      <button type="button" id="download-student-template" class="block mt-2 font-semibold underline">Download CSV template</button>
+    </div>
+    <form id="${formId}" class="space-y-2" enctype="multipart/form-data">
+      ${field({ name: 'file', label: 'Student CSV file', type: 'file', required: true, accept: '.csv,text/csv', help: 'Maximum 500 students per import.' })}
+      ${field({ name: 'initial_password', label: 'Initial password for all imported students', type: 'password', required: true, minlength: 12, help: 'At least 12 characters. Give this password privately to students.' })}
+    </form>`,
+    footer: `<button type="button" data-cancel class="${btnClass('secondary')}">Cancel</button><button type="submit" form="${formId}" class="${btnClass('primary')}">Import students</button>`,
+  });
+  modal.root.querySelector('#download-student-template').addEventListener('click', downloadStudentTemplate);
+  modal.root.querySelector('[data-cancel]').addEventListener('click', modal.close);
+  modal.root.querySelector('form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+    const submit = modal.root.querySelector('button[type="submit"]');
+    setBusy(submit, true);
+    try {
+      const result = await api.upload('/students/import', new FormData(form));
+      modal.close();
+      toast(`${result.created} student accounts created`);
+      list.reload();
+    } catch (error) {
+      setBusy(submit, false);
+    }
+  });
+}
+
+function downloadStudentTemplate() {
+  const headers = 'email,first_name,last_name,student_code,grade_level,section,department_code,admission_date,date_of_birth,gender,guardian_name,guardian_phone,guardian_relation,blood_group,address_line,city,postal_code,guardian_email,status';
+  const example = 'student1@example.com,Asha,Patil,STU26001,5,A,PRIMARY,2026-06-01,2015-04-12,female,Ramesh Patil,9876543210,Father,O+,Mamdapur,Mamdapur,413001,parent@example.com,active';
+  const url = URL.createObjectURL(new Blob([`${headers}\n${example}\n`], { type: 'text/csv;charset=utf-8' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'zpps-students-template.csv';
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 /** Two-step modal: Account -> Profile, then one POST /api/students. */

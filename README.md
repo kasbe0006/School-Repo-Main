@@ -252,6 +252,14 @@ persistent disk. The Render subdomain is free; a custom domain is optional later
 The login page does not expose demo accounts. Create all staff and student accounts from the
 administrator portal using real school records.
 
+### Bulk student accounts
+
+Admins do not need to enter students one by one. On **Students**, choose **Import CSV**,
+download the template, fill one row per student, and upload it. The admin chooses one initial
+password for the whole import; every student still has a separate email/login. Give each
+student their email and the shared initial password, then require them to change it after
+their first login. Imports accept up to 500 students and fail as a whole if any row is invalid.
+
 ---
 
 ## Testing

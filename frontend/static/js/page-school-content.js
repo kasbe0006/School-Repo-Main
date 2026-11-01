@@ -7,14 +7,28 @@ const CONTENT_KINDS = [
 
 function initSchoolContent({ content, user }) {
   content.innerHTML = pageHeader(
-    'School Content',
-    'Publish notices, activities, event details, gallery media, admission requirements and scholarship information.',
+    'Notices & Announcements',
+    'Publish school notices, announcements, activities, gallery media, admission requirements and scholarship information.',
     user.role === 'admin'
-      ? `<button type="button" id="new-content" class="${btnClass('primary')}">${icon('plus', 16)} Add content</button>`
+      ? `<div class="flex flex-wrap gap-2">
+          <button type="button" id="new-announcement" class="${btnClass('secondary')}">${icon('megaphone', 16)} New announcement</button>
+          <button type="button" id="new-content" class="${btnClass('primary')}">${icon('plus', 16)} Add notice/content</button>
+        </div>`
       : '',
-  ) + `<div id="content-list">${card(skeletonCards(3))}</div>`;
+  ) + `<div class="space-y-6">
+    <section>
+      <h2 class="text-sm font-semibold text-ink mb-3">Announcements</h2>
+      <div id="announcement-list">${card(skeletonCards(2))}</div>
+    </section>
+    <section>
+      <h2 class="text-sm font-semibold text-ink mb-3">School notices and content</h2>
+      <div id="content-list">${card(skeletonCards(3))}</div>
+    </section>
+  </div>`;
   loadSchoolContent();
+  loadAnnouncements();
   document.getElementById('new-content')?.addEventListener('click', openContentForm);
+  document.getElementById('new-announcement')?.addEventListener('click', openAnnouncementForm);
 }
 
 async function loadSchoolContent() {
@@ -29,6 +43,7 @@ async function loadSchoolContent() {
       }));
       return;
     }
+
     mount.innerHTML = `<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">${data.items.map(contentCard).join('')}</div>`;
     mount.querySelectorAll('[data-delete-content]').forEach((button) => {
       button.addEventListener('click', async () => {
@@ -42,6 +57,66 @@ async function loadSchoolContent() {
   } catch (error) {
     showError(mount, error, loadSchoolContent);
   }
+}
+
+async function loadAnnouncements() {
+  const mount = document.getElementById('announcement-list');
+  try {
+    const data = await api.get('/announcements', { limit: 100, sort: 'published_at', order: 'desc', include_expired: true });
+    mount.innerHTML = data.items.length
+      ? `<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">${data.items.map(announcementCard).join('')}</div>`
+      : card(emptyState({ iconName: 'megaphone', title: 'No announcements yet', subtitle: 'Create an announcement for school users.' }));
+    refreshIcons();
+  } catch (error) {
+    showError(mount, error, loadAnnouncements);
+  }
+}
+
+function announcementCard(item) {
+  const audience = [
+    item.target_role ? `Role: ${titleCase(item.target_role)}` : '',
+    item.target_department_code ? `Class group: ${item.target_department_code}` : '',
+  ].filter(Boolean).join(' · ') || 'Everyone';
+  return `<article class="bg-white rounded-xl border border-line shadow-sm p-5">
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">${icon('megaphone', 16)}</div>
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <h3 class="font-semibold text-ink">${escapeHtml(item.title)}</h3>
+          ${item.is_expired ? badge('inactive', 'Expired') : badge('published', 'Published')}
+        </div>
+        <p class="text-sm text-slate-600 whitespace-pre-line mt-2">${escapeHtml(item.body)}</p>
+        <p class="text-xs text-muted mt-3">${escapeHtml(audience)} · ${formatDateTime(item.published_at)}</p>
+      </div>
+    </div>
+  </article>`;
+}
+
+async function openAnnouncementForm() {
+  let departments = [];
+  try {
+    departments = await loadDepartments();
+  } catch (error) {
+    toast(error.message, 'error');
+    return;
+  }
+  const modal = formModal({
+    title: 'New announcement',
+    submitText: 'Publish announcement',
+    size: 'max-w-2xl',
+    fieldsHtml: `
+      ${field({ name: 'title', label: 'Title', required: true, minlength: 3, maxlength: 150 })}
+      ${field({ name: 'expires_on', label: 'Expires on', type: 'date', min: todayISO() })}
+      ${field({ name: 'body', label: 'Announcement', type: 'textarea', required: true, minlength: 3, maxlength: 5000, className: 'sm:col-span-2' })}
+      ${field({ name: 'target_role', label: 'Audience role', type: 'select', emptyLabel: 'Everyone', options: [
+        { value: 'admin', label: 'Admins' }, { value: 'teacher', label: 'Teachers' },
+        { value: 'student', label: 'Students' }, { value: 'accountant', label: 'Accountants' },
+      ] })}
+      ${field({ name: 'target_department_id', label: 'Class group', type: 'select', number: true, emptyLabel: 'All class groups', options: toOptions(departments, (d) => d.code) })}`,
+    onSubmit: (values) => api.post('/announcements', values),
+    onSuccess: () => { toast('Announcement published'); loadAnnouncements(); },
+  });
+  modal.form.classList.add('grid', 'grid-cols-1', 'sm:grid-cols-2', 'gap-x-4');
 }
 
 function contentCard(item) {

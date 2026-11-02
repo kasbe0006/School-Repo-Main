@@ -5,13 +5,13 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://alaska-lock-vcr-formula.trycloudflare.com/api/:splat"
+  to = "https://fork-prison-seeing-academy.trycloudflare.com/api/:splat"
   status = 200
   force = true
 
 [[redirects]]
   from = "/media/*"
-  to = "https://alaska-lock-vcr-formula.trycloudflare.com/media/:splat"
+  to = "https://fork-prison-seeing-academy.trycloudflare.com/media/:splat"
   status = 200
   force = true
 

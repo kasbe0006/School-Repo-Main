@@ -5,13 +5,13 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://kinds-andale-beans-appropriate.trycloudflare.com/api/:splat"
+  to = "https://crucial-optional-links-supports.trycloudflare.com/api/:splat"
   status = 200
   force = true
 
 [[redirects]]
   from = "/media/*"
-  to = "https://kinds-andale-beans-appropriate.trycloudflare.com/media/:splat"
+  to = "https://crucial-optional-links-supports.trycloudflare.com/media/:splat"
   status = 200
   force = true
 
